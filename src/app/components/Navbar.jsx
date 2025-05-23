@@ -23,7 +23,7 @@ export default function Navbar() {
       if (sessionToken) {
         setIsLoading(true);
         try {
-          const response = await fetch('http://localhost/v1/auth/verify-session/', {
+          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -54,7 +54,7 @@ export default function Navbar() {
     setIsLoading(true);
     try {
       // Optionally, call a backend logout endpoint to invalidate the token
-      await fetch('http://localhost/v1/auth/logout/', {
+      await fetch('https://hendriansyah.xyz/v1/auth/logout/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_token: localStorage.getItem('session_token') }),

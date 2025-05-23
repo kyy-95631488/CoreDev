@@ -143,7 +143,7 @@ export default function AddProject() {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         try {
-          const response = await fetch('http://localhost/v1/auth/verify-session/', {
+          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -176,7 +176,7 @@ export default function AddProject() {
     if (userRole === 'anggota' || userRole === 'dosen') {
       const fetchUsers = async () => {
         try {
-          const response = await fetch('http://localhost/v1/auth/get-users/', {
+          const response = await fetch('https://hendriansyah.xyz/v1/auth/get-users/', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           });
@@ -328,7 +328,7 @@ export default function AddProject() {
     submissionData.append('thumbnail_path', thumbnailUrl);
 
     try {
-      const response = await fetch('http://localhost/v1/auth/add-project/', {
+      const response = await fetch('https://hendriansyah.xyz/v1/auth/add-project/', {
         method: 'POST',
         body: submissionData,
       });

@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost/v1/auth/forgot-password/', {
+      const response = await fetch('https://hendriansyah.xyz/v1/auth/forgot-password/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'request_reset', email }),
@@ -71,7 +71,7 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      const response = await fetch('http://localhost/v1/auth/forgot-password/', {
+      const response = await fetch('https://hendriansyah.xyz/v1/auth/forgot-password/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'reset_password', email, code: resetCode, new_password: newPassword }),

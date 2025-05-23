@@ -24,7 +24,7 @@ export default function LoginPage() {
       if (sessionToken) {
         setIsLoading(true);
         try {
-          const response = await fetch('http://localhost/v1/auth/verify-session/', {
+          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -59,7 +59,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost/v1/auth/login/', {
+      const response = await fetch('https://hendriansyah.xyz/v1/auth/login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'login', email, password }),
@@ -110,7 +110,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost/v1/auth/login/', {
+      const response = await fetch('https://hendriansyah.xyz/v1/auth/login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'verify', email, code: verificationCode }),
@@ -160,7 +160,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost/v1/auth/login/', {
+      const response = await fetch('https://hendriansyah.xyz/v1/auth/login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'resend', email }),

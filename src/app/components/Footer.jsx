@@ -16,7 +16,7 @@ export default function Footer() {
       if (sessionToken) {
         setIsLoading(true);
         try {
-          const response = await fetch('http://localhost/v1/auth/verify-session/', {
+          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),

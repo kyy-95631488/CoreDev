@@ -115,7 +115,7 @@ export default function Dashboard() {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         try {
-          const response = await fetch('http://localhost/v1/auth/verify-session/', {
+          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -148,7 +148,7 @@ export default function Dashboard() {
     if (userRole === 'anggota' || userRole === 'dosen') {
       const fetchUsers = async () => {
         try {
-          const response = await fetch('http://localhost/v1/auth/get-users/', {
+          const response = await fetch('https://hendriansyah.xyz/v1/auth/get-users/', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           });
@@ -187,7 +187,7 @@ export default function Dashboard() {
           if (!sessionToken) {
             throw new Error('No session token found');
           }
-          const response = await fetch(`http://localhost/v1/auth/get-projects/?session_token=${encodeURIComponent(sessionToken)}`, {
+          const response = await fetch(`https://hendriansyah.xyz/v1/auth/get-projects/?session_token=${encodeURIComponent(sessionToken)}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           });
@@ -239,7 +239,7 @@ export default function Dashboard() {
       onConfirm: async () => {
         try {
           const sessionToken = localStorage.getItem('session_token');
-          const response = await fetch('http://localhost/v1/auth/delete-user/', {
+          const response = await fetch('https://hendriansyah.xyz/v1/auth/delete-user/', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken, email }),
@@ -286,7 +286,7 @@ export default function Dashboard() {
 
     try {
       const sessionToken = localStorage.getItem('session_token');
-      const response = await fetch('http://localhost/v1/auth/update-role/', {
+      const response = await fetch('https://hendriansyah.xyz/v1/auth/update-role/', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_token: sessionToken, email: selectedUser.email, role: newRole }),

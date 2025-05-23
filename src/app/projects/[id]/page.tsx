@@ -33,7 +33,7 @@ export default function ProjectDetail() {
     const fetchProject = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`http://localhost/v1/auth/get-project-by-id/?id=${id}`, {
+        const response = await fetch(`https://hendriansyah.xyz/v1/auth/get-project-by-id/?id=${id}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
