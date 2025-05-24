@@ -5,7 +5,6 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send } from 'lucide-react';
 import { marked } from 'marked';
-import DOMPurify from 'dompurify';
 
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -32,12 +31,12 @@ declare global {
   }
 }
 
-const formatAIResponse = (text: string): string => {
+const formatAIResponse = async (text: string): Promise<string> => {
   let formattedText = text
     .trim()
     .replace(/\n{3,}/g, '\n\n')
     .replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang = '', code) => {
-      const escapedCode = code.replace(/</g, '<').replace(/>/g, '>');
+      const escapedCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
       return `<pre class="bg-gray-800 p-3 rounded-lg"><code class="language-${lang}">${escapedCode}</code></pre>`;
     })
     .replace(/^-{3,}$/gm, '<hr class="border-gray-600">')
@@ -45,16 +44,21 @@ const formatAIResponse = (text: string): string => {
     .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>');
 
   try {
-    formattedText = marked.parse(formattedText) as string;
+    formattedText = (await marked.parse(formattedText)) as string;
   } catch (error) {
     console.warn('Failed to parse Markdown:', error);
   }
 
-  return DOMPurify.sanitize(formattedText);
+  // Only sanitize if in browser environment
+  if (typeof window !== 'undefined') {
+    const { default: DOMPurify } = await import('dompurify');
+    return DOMPurify.sanitize(formattedText);
+  }
+  return formattedText; // Return unsanitized on server (safe fallback)
 };
 
 const formatUserInput = (text: string): string => {
-  return text.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
 
 interface ChatMessageProps {
@@ -72,9 +76,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ role, content }) => (
   >
     <div
       className={`inline-block rounded-lg p-4 max-w-[90%] sm:max-w-[80%] break-words ${
-        role === 'user'
-          ? 'bg-blue-600/80 text-white'
-          : 'bg-gray-700/80 text-gray-200'
+        role === 'user' ? 'bg-blue-600/80 text-white' : 'bg-gray-700/80 text-gray-200'
       } shadow-md`}
     >
       <strong className={`block mb-1 ${role === 'user' ? 'text-blue-200' : 'text-green-400'}`}>
@@ -92,11 +94,21 @@ export default function AIPage() {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
     {
       role: 'assistant',
-      content: formatAIResponse(
-        "Hi there! I'm Grok, your witty AI assistant. I'm here to help you with anything you'd like to know about. What's on your mind?"
-      ),
+      content: '',
     },
   ]);
+
+  // Initialize the assistant message with formatAIResponse
+  useEffect(() => {
+    const initializeMessages = async () => {
+      const initialMessage = await formatAIResponse(
+        "Hi there! I'm Grok, your witty AI assistant. I'm here to help you with anything you'd like to know about. What's on your mind?"
+      );
+      setMessages([{ role: 'assistant', content: initialMessage }]);
+    };
+    initializeMessages();
+  }, []);
+
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -122,7 +134,7 @@ export default function AIPage() {
       let assistantResponse = '';
       for await (const part of response) {
         assistantResponse += part.text;
-        const formattedResponse = formatAIResponse(assistantResponse);
+        const formattedResponse = await formatAIResponse(assistantResponse);
         setMessages((prev) => {
           const updatedMessages = [...prev];
           const lastMessage = updatedMessages[updatedMessages.length - 1];
@@ -139,10 +151,8 @@ export default function AIPage() {
       }
     } catch (error) {
       console.error('Error fetching Grok response:', error);
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: formatAIResponse('Oops, something went wrong. Please try again!') },
-      ]);
+      const errorMessage = await formatAIResponse('Oops, something went wrong. Please try again!');
+      setMessages((prev) => [...prev, { role: 'assistant', content: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
