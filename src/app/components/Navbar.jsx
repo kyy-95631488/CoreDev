@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { Menu, X, LogIn, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, LayoutDashboard, Bot } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
@@ -53,7 +53,6 @@ export default function Navbar() {
   const handleLogout = async () => {
     setIsLoading(true);
     try {
-      // Optionally, call a backend logout endpoint to invalidate the token
       await fetch('https://hendriansyah.xyz/v1/auth/logout/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,7 +60,7 @@ export default function Navbar() {
       });
 
       localStorage.removeItem('session_token');
-      localStorage.removeItem('rememberedEmail'); // Optional: clear remembered email
+      localStorage.removeItem('rememberedEmail');
       setIsLoggedIn(false);
       router.push('/');
     } catch (err) {
@@ -71,21 +70,63 @@ export default function Navbar() {
     }
   };
 
+  // Button animation variants
+  const buttonVariants = {
+    hover: {
+      scale: 1.05,
+      boxShadow: "0 8px 20px rgba(59, 130, 246, 0.3)",
+      transition: { duration: 0.3, ease: "easeOut" }
+    },
+    tap: {
+      scale: 0.95,
+      transition: { duration: 0.2 }
+    },
+    loading: {
+      opacity: 0.7,
+      scale: 1,
+      transition: { duration: 0.2 }
+    }
+  };
+
+  // Icon animation for buttons
+  const iconVariants = {
+    initial: { rotate: 0, scale: 1 },
+    hover: { 
+      rotate: [0, 10, -10, 0], 
+      scale: 1.1,
+      transition: { duration: 0.4 }
+    }
+  };
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.7, ease: 'easeOut' }}
-      className="fixed top-0 w-full bg-opacity-95 backdrop-blur-lg z-50 border-b border-blue-500/30"
+      className="fixed top-0 w-full bg-opacity-95 backdrop-blur-xl z-50 border-b border-blue-500/20 shadow-lg"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        <motion.h1
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500"
-        >
-          CoreDev
-        </motion.h1>
+        <Link href="/">
+          <motion.h1
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            whileHover={{
+              scale: 1.05,
+              textShadow: "0 0 10px rgba(59, 130, 246, 0.8), 0 0 20px rgba(147, 51, 234, 0.6)",
+              transition: { duration: 0.3 }
+            }}
+            whileTap={{ scale: 0.95 }}
+            className="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 cursor-pointer relative"
+          >
+            CoreDev
+            <motion.span
+              className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full"
+              initial={{ scaleX: 0 }}
+              whileHover={{ scaleX: 1 }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.h1>
+        </Link>
         <div className="flex items-center gap-4">
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
@@ -93,55 +134,82 @@ export default function Navbar() {
               <Link
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className="relative text-lg font-medium hover:text-blue-400 transition-colors group"
+                className="relative text-lg font-medium text-gray-200 hover:text-blue-400 transition-colors group"
               >
                 {item}
                 <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
               </Link>
             ))}
+            <motion.a
+              href="/ai"
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              animate={isLoading ? "loading" : "initial"}
+              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-500 hover:to-teal-500 transition-all duration-300 shadow-md hover:shadow-xl border border-green-500/30 touch-manipulation"
+            >
+              <motion.span variants={iconVariants}>
+                <Bot size={20} />
+              </motion.span>
+              <span className="font-semibold">AI</span>
+            </motion.a>
             {isLoggedIn ? (
               <>
                 <motion.a
                   href="/dashboard"
-                  whileHover={{ scale: isLoading ? 1 : 1.1 }}
-                  whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-lg"
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                  animate={isLoading ? "loading" : "initial"}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-md hover:shadow-xl border border-blue-500/30 touch-manipulation"
                 >
-                  <LayoutDashboard size={20} />
-                  Dashboard
+                  <motion.span variants={iconVariants}>
+                    <LayoutDashboard size={20} />
+                  </motion.span>
+                  <span className="font-semibold">Dashboard</span>
                 </motion.a>
                 <motion.button
                   onClick={handleLogout}
-                  whileHover={{ scale: isLoading ? 1 : 1.1 }}
-                  whileTap={{ scale: isLoading ? 1 : 0.95 }}
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                  animate={isLoading ? "loading" : "initial"}
                   disabled={isLoading}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-full hover:from-red-500 hover:to-red-700 transition-all duration-300 shadow-lg"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg hover:from-red-500 hover:to-red-700 transition-all duration-300 shadow-md hover:shadow-xl border border-red-500/30 touch-manipulation"
                 >
-                  <LogOut size={20} />
-                  Logout
+                  <motion.span variants={iconVariants}>
+                    <LogOut size={20} />
+                  </motion.span>
+                  <span className="font-semibold">Logout</span>
                 </motion.button>
               </>
             ) : (
               <motion.a
                 href="/login"
-                whileHover={{ scale: isLoading ? 1 : 1.1 }}
-                whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-lg"
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
+                animate={isLoading ? "loading" : "initial"}
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-md hover:shadow-xl border border-blue-500/30 touch-manipulation"
               >
-                <LogIn size={20} />
-                Login
+                <motion.span variants={iconVariants}>
+                  <LogIn size={20} />
+                </motion.span>
+                <span className="font-semibold">Login</span>
               </motion.a>
             )}
           </div>
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 rounded-full hover:bg-blue-500/20 transition-colors"
+          <motion.button
+            className="md:hidden p-2.5 rounded-full bg-gray-800/50 hover:bg-blue-500/20 transition-colors border border-blue-500/30 touch-manipulation"
             onClick={toggleMenu}
             aria-label="Toggle menu"
             disabled={isLoading}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
             {isMenuOpen ? <X size={24} className="text-blue-400" /> : <Menu size={24} className="text-blue-400" />}
-          </button>
+          </motion.button>
         </div>
       </div>
       {/* Mobile Navigation */}
@@ -151,56 +219,82 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-gray-900/95 backdrop-blur-lg px-4 py-2 border-t border-blue-500/30"
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="md:hidden bg-gray-900/95 backdrop-blur-xl px-4 py-4 border-t border-blue-500/20"
           >
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               {['About', 'Projects', 'Contact'].map((item) => (
                 <Link
                   key={item}
                   href={`#${item.toLowerCase()}`}
-                  className="text-lg hover:text-blue-400 transition-colors"
+                  className="text-lg text-gray-200 hover:text-blue-400 transition-colors py-2"
                   onClick={toggleMenu}
                 >
                   {item}
                 </Link>
               ))}
+              <motion.a
+                href="/ai"
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
+                animate={isLoading ? "loading" : "initial"}
+                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-500 hover:to-teal-500 transition-all duration-300 shadow-md border border-green-500/30 touch-manipulation"
+                onClick={toggleMenu}
+              >
+                <motion.span variants={iconVariants}>
+                  <Bot size={20} />
+                </motion.span>
+                <span className="font-semibold">AI</span>
+              </motion.a>
               {isLoggedIn ? (
                 <>
                   <motion.a
                     href="/dashboard"
-                    whileHover={{ scale: isLoading ? 1 : 1.05 }}
-                    whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                    className="flex items-center gap-2 p-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-500 hover:to-purple-500 transition-all duration-300"
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                    animate={isLoading ? "loading" : "initial"}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-md border border-blue-500/30 touch-manipulation"
                     onClick={toggleMenu}
                   >
-                    <LayoutDashboard size={20} />
-                    Dashboard
+                    <motion.span variants={iconVariants}>
+                      <LayoutDashboard size={20} />
+                    </motion.span>
+                    <span className="font-semibold">Dashboard</span>
                   </motion.a>
                   <motion.button
                     onClick={() => {
                       handleLogout();
                       toggleMenu();
                     }}
-                    whileHover={{ scale: isLoading ? 1 : 1.05 }}
-                    whileTap={{ scale: isLoading ? 1 : 0.95 }}
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                    animate={isLoading ? "loading" : "initial"}
                     disabled={isLoading}
-                    className="flex items-center gap-2 p-2 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-full hover:from-red-500 hover:to-red-700 transition-all duration-300"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg hover:from-red-500 hover:to-red-700 transition-all duration-300 shadow-md border border-red-500/30 touch-manipulation"
                   >
-                    <LogOut size={20} />
-                    Logout
+                    <motion.span variants={iconVariants}>
+                      <LogOut size={20} />
+                    </motion.span>
+                    <span className="font-semibold">Logout</span>
                   </motion.button>
                 </>
               ) : (
                 <motion.a
                   href="/login"
-                  whileHover={{ scale: isLoading ? 1 : 1.05 }}
-                  whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                  className="flex items-center gap-2 p-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-500 hover:to-purple-500 transition-all duration-300"
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                  animate={isLoading ? "loading" : "initial"}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-md border border-blue-500/30 touch-manipulation"
                   onClick={toggleMenu}
                 >
-                  <LogIn size={20} />
-                  Login
+                  <motion.span variants={iconVariants}>
+                    <LogIn size={20} />
+                  </motion.span>
+                  <span className="font-semibold">Login</span>
                 </motion.a>
               )}
             </div>

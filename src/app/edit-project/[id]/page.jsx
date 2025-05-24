@@ -2,19 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { FolderPlus, X } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
-// Custom Dialog Component
 const CustomDialog = ({ isOpen, onClose, title, message, isConfirm = false, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel' }) => {
   return (
     <AnimatePresence>
@@ -82,7 +74,7 @@ const CustomDialog = ({ isOpen, onClose, title, message, isConfirm = false, onCo
   );
 };
 
-export default function AddProject() {
+export default function EditProject() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState(null);
@@ -108,8 +100,8 @@ export default function AddProject() {
     onConfirm: null,
   });
   const router = useRouter();
+  const { id } = useParams();
 
-  // List of frameworks
   const frameworkOptions = [
     'Java NetBeans',
     'Java Android',
@@ -137,9 +129,9 @@ export default function AddProject() {
     'Kubernetes',
   ];
 
-  // Check session token and fetch role
+  // Check session and fetch project data
   useEffect(() => {
-    const checkSession = async () => {
+    const checkSessionAndFetchProject = async () => {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         try {
@@ -152,13 +144,42 @@ export default function AddProject() {
           if (response.ok && data.valid) {
             setIsLoggedIn(true);
             setUserRole(data.role);
+            // Fetch project data
+            const projectResponse = await fetch(`https://hendriansyah.xyz/v1/auth/get-project/?session_token=${encodeURIComponent(sessionToken)}&project_id=${id}`, {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            });
+            const projectData = await projectResponse.json();
+            if (projectResponse.ok) {
+              setFormData({
+                name: projectData.project.name || '',
+                description: projectData.project.description || '',
+                startDate: projectData.project.start_date || '',
+                endDate: projectData.project.end_date || '',
+                teamMembers: projectData.project.team_members || [],
+                thumbnail: null,
+                thumbnailUrl: projectData.project.thumbnail_path || '',
+                frameworks: projectData.project.frameworks || [],
+                previewLink: projectData.project.preview_link || '',
+                githubLink: projectData.project.github_link || '',
+              });
+              setThumbnailPreview(projectData.project.thumbnail_path || null);
+            } else {
+              setDialogState({
+                isOpen: true,
+                title: 'Error',
+                message: `Failed to fetch project: ${projectData.error}`,
+                isConfirm: false,
+              });
+              router.push('/list-project');
+            }
           } else {
             setIsLoggedIn(false);
             localStorage.removeItem('session_token');
             router.push('/login');
           }
         } catch (err) {
-          console.error('Session check failed:', err);
+          console.error('Session or project fetch failed:', err);
           setIsLoggedIn(false);
           localStorage.removeItem('session_token');
           router.push('/login');
@@ -168,8 +189,8 @@ export default function AddProject() {
       }
       setIsLoading(false);
     };
-    checkSession();
-  }, [router]);
+    checkSessionAndFetchProject();
+  }, [router, id]);
 
   // Fetch users for team member selection
   useEffect(() => {
@@ -205,18 +226,6 @@ export default function AddProject() {
     }
   }, [userRole]);
 
-  // Handle theme
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialDarkMode = savedTheme ? savedTheme === 'dark' : prefersDark;
-    if (initialDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -241,7 +250,6 @@ export default function AddProject() {
         });
         return;
       }
-
       setFormData((prev) => ({
         ...prev,
         thumbnail: file,
@@ -266,56 +274,14 @@ export default function AddProject() {
     }));
   };
 
-  // Upload thumbnail to Supabase
-  const uploadThumbnail = async (file) => {
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const { data, error } = await supabase.storage
-        .from('thumbnails')
-        .upload(`public/${fileName}`, file);
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      const { data: urlData } = supabase.storage
-        .from('thumbnails')
-        .getPublicUrl(`public/${fileName}`);
-
-      if (!urlData.publicUrl) {
-        throw new Error('Failed to retrieve public URL');
-      }
-
-      return urlData.publicUrl;
-    } catch (err) {
-      throw new Error('Failed to upload thumbnail to Supabase: ' + err.message);
-    }
-  };
-
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    let thumbnailUrl = '';
-    if (formData.thumbnail) {
-      try {
-        thumbnailUrl = await uploadThumbnail(formData.thumbnail);
-      } catch (err) {
-        setDialogState({
-          isOpen: true,
-          title: 'Error',
-          message: err.message,
-          isConfirm: false,
-        });
-        setIsLoading(false);
-        return;
-      }
-    }
-
     const sessionToken = localStorage.getItem('session_token');
     const submissionData = new FormData();
+    submissionData.append('project_id', id);
     submissionData.append('name', formData.name);
     submissionData.append('description', formData.description);
     submissionData.append('startDate', formData.startDate);
@@ -325,11 +291,15 @@ export default function AddProject() {
     submissionData.append('previewLink', formData.previewLink);
     submissionData.append('githubLink', formData.githubLink);
     submissionData.append('session_token', sessionToken);
-    submissionData.append('thumbnail_path', thumbnailUrl);
+    if (formData.thumbnail) {
+      submissionData.append('thumbnail', formData.thumbnail);
+    } else {
+      submissionData.append('thumbnail_path', formData.thumbnailUrl);
+    }
 
     try {
-      const response = await fetch('https://hendriansyah.xyz/v1/auth/add-project/', {
-        method: 'POST',
+      const response = await fetch('https://hendriansyah.xyz/v1/auth/update-project/', {
+        method: 'PUT',
         body: submissionData,
       });
       const data = await response.json();
@@ -337,37 +307,24 @@ export default function AddProject() {
         setDialogState({
           isOpen: true,
           title: 'Success',
-          message: 'Project added successfully',
+          message: 'Project updated successfully',
           isConfirm: false,
         });
-        setFormData({
-          name: '',
-          description: '',
-          startDate: '',
-          endDate: '',
-          teamMembers: [],
-          thumbnail: null,
-          thumbnailUrl: '',
-          frameworks: [],
-          previewLink: '',
-          githubLink: '',
-        });
-        setThumbnailPreview(null);
-        setTimeout(() => router.push('/dashboard'), 1500);
+        setTimeout(() => router.push('/list-project'), 1500);
       } else {
         setDialogState({
           isOpen: true,
           title: 'Error',
-          message: `Failed to add project: ${data.error}`,
+          message: `Failed to update project: ${data.error}`,
           isConfirm: false,
         });
       }
     } catch (err) {
-      console.error('Error adding project:', err);
+      console.error('Error updating project:', err);
       setDialogState({
         isOpen: true,
         title: 'Error',
-        message: 'Error adding project',
+        message: 'Error updating project',
         isConfirm: false,
       });
     } finally {
@@ -408,7 +365,7 @@ export default function AddProject() {
           className="w-full max-w-3xl z-10"
         >
           <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 text-center">
-            Add New Project
+            Edit Project
           </h1>
 
           <motion.form
@@ -637,7 +594,7 @@ export default function AddProject() {
               className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-400 text-white rounded-lg font-semibold ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <FolderPlus size={20} />
-              {isLoading ? 'Creating...' : 'Create Project'}
+              {isLoading ? 'Updating...' : 'Update Project'}
             </motion.button>
           </motion.form>
         </motion.div>

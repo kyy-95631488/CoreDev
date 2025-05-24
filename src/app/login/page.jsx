@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogIn, Mail, Lock, Eye, EyeOff, Key, X, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // Import useRouter for redirection
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,7 +15,8 @@ export default function LoginPage() {
   const [dialog, setDialog] = useState({ isOpen: false, message: '', type: 'error' });
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const router = useRouter(); // Initialize router
+  const [resendCooldown, setResendCooldown] = useState(0); // State for cooldown timer
+  const router = useRouter();
 
   // Check for valid session token on component mount
   useEffect(() => {
@@ -32,7 +33,6 @@ export default function LoginPage() {
 
           const data = await response.json();
           if (response.ok && data.valid) {
-            // Session is valid, redirect to dashboard
             router.push('/dashboard');
           }
         } catch (err) {
@@ -52,6 +52,16 @@ export default function LoginPage() {
       setRememberMe(true);
     }
   }, [router]);
+
+  // Handle cooldown timer
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setInterval(() => {
+        setResendCooldown((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [resendCooldown]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -95,7 +105,7 @@ export default function LoginPage() {
       localStorage.setItem('session_token', data.session_token);
       setDialog({ isOpen: true, message: 'Login successful! Redirecting...', type: 'success' });
       setTimeout(() => {
-        router.push('/dashboard'); // Use router.push instead of window.location.href
+        router.push('/dashboard');
       }, 1000);
     } catch (err) {
       setDialog({ isOpen: true, message: `firewood error: ${err.message}`, type: 'error' });
@@ -146,7 +156,7 @@ export default function LoginPage() {
       setDialog({ isOpen: true, message: 'Verification successful! Logging in...', type: 'success' });
       setShowVerificationDialog(false);
       setTimeout(() => {
-        router.push('/dashboard'); // Use router.push
+        router.push('/dashboard');
       }, 1000);
     } catch (err) {
       setDialog({ isOpen: true, message: `firewood error: ${err.message}`, type: 'error' });
@@ -158,6 +168,7 @@ export default function LoginPage() {
   const handleResendCode = async () => {
     setDialog({ isOpen: false, message: '', type: 'error' });
     setIsLoading(true);
+    setResendCooldown(30); // Set 30-second cooldown
 
     try {
       const response = await fetch('https://hendriansyah.xyz/v1/auth/login/', {
@@ -468,12 +479,12 @@ export default function LoginPage() {
             </form>
             <motion.button
               onClick={handleResendCode}
-              whileHover={{ scale: isLoading ? 1 : 1.05 }}
-              whileTap={{ scale: isLoading ? 1 : 0.95 }}
-              disabled={isLoading}
+              whileHover={{ scale: isLoading || resendCooldown > 0 ? 1 : 1.05 }}
+              whileTap={{ scale: isLoading || resendCooldown > 0 ? 1 : 0.95 }}
+              disabled={isLoading || resendCooldown > 0}
               className="w-full mt-4 text-blue-400 hover:text-blue-300 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Resend Code
+              {resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : 'Resend Code'}
             </motion.button>
           </motion.div>
         </motion.div>

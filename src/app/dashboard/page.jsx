@@ -18,10 +18,8 @@ import {
   Legend,
 } from 'chart.js';
 
-// Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-// Custom Dialog Component with mobile-friendly adjustments
 const CustomDialog = ({ isOpen, onClose, title, message, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel', isConfirm = false }) => {
   return (
     <AnimatePresence>
@@ -90,6 +88,40 @@ const CustomDialog = ({ isOpen, onClose, title, message, onConfirm, confirmText 
   );
 };
 
+const LoadingSpinner = () => (
+  <motion.div
+    className="flex items-center justify-center gap-2"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+  >
+    <motion.div
+      className="w-4 h-4 bg-blue-400 rounded-full"
+      animate={{
+        scale: [1, 1.5, 1],
+        opacity: [0.6, 1, 0.6],
+      }}
+      transition={{ repeat: Infinity, duration: 0.8, delay: 0 }}
+    />
+    <motion.div
+      className="w-4 h-4 bg-blue-500 rounded-full"
+      animate={{
+        scale: [1, 1.5, 1],
+        opacity: [0.6, 1, 0.6],
+      }}
+      transition={{ repeat: Infinity, duration: 0.8, delay: 0.2 }}
+    />
+    <motion.div
+      className="w-4 h-4 bg-blue-600 rounded-full"
+      animate={{
+        scale: [1, 1.5, 1],
+        opacity: [0.6, 1, 0.6],
+      }}
+      transition={{ repeat: Infinity, duration: 0.8, delay: 0.4 }}
+    />
+  </motion.div>
+);
+
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -100,6 +132,7 @@ export default function Dashboard() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState('');
+  const [requestRole, setRequestRole] = useState('anggota');
   const [dialogState, setDialogState] = useState({
     isOpen: false,
     title: '',
@@ -107,9 +140,11 @@ export default function Dashboard() {
     onConfirm: null,
     isConfirm: false,
   });
+  const [isRequestDisabled, setIsRequestDisabled] = useState(false);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const [isRequestLoading, setIsRequestLoading] = useState(false);
   const router = useRouter();
 
-  // Check session token and fetch role
   useEffect(() => {
     const checkSession = async () => {
       const sessionToken = localStorage.getItem('session_token');
@@ -143,7 +178,6 @@ export default function Dashboard() {
     checkSession();
   }, [router]);
 
-  // Fetch users for anggota or dosen roles
   useEffect(() => {
     if (userRole === 'anggota' || userRole === 'dosen') {
       const fetchUsers = async () => {
@@ -178,7 +212,6 @@ export default function Dashboard() {
     }
   }, [userRole]);
 
-  // Fetch projects for chart
   useEffect(() => {
     if (userRole === 'anggota' || userRole === 'dosen') {
       const fetchProjects = async () => {
@@ -217,19 +250,6 @@ export default function Dashboard() {
     }
   }, [userRole]);
 
-  // Handle theme
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialDarkMode = savedTheme ? savedTheme === 'dark' : prefersDark;
-    if (initialDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
-  // Handle user deletion
   const handleDeleteUser = (email) => {
     setDialogState({
       isOpen: true,
@@ -274,7 +294,6 @@ export default function Dashboard() {
     });
   };
 
-  // Handle role editing
   const openEditModal = (user) => {
     setSelectedUser(user);
     setNewRole(user.role);
@@ -326,17 +345,73 @@ export default function Dashboard() {
     }
   };
 
-  // Filter users based on search term
+  const handleRequestRole = async () => {
+    setIsRequestLoading(true);
+    setIsRequestDisabled(true);
+    try {
+      const sessionToken = localStorage.getItem('session_token');
+      const response = await fetch('https://hendriansyah.xyz/v1/auth/request-role/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_token: sessionToken, requested_role: requestRole }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setDialogState({
+          isOpen: true,
+          title: 'Success',
+          message: 'Role request sent successfully to anggota users',
+          isConfirm: false,
+        });
+        setCooldownSeconds(30);
+      } else {
+        setDialogState({
+          isOpen: true,
+          title: 'Error',
+          message: data.error,
+          isConfirm: false,
+        });
+        if (!data.error.includes('Please wait') && !data.error.includes('Maximum 3 role requests')) {
+          setIsRequestDisabled(false);
+        }
+      }
+    } catch (err) {
+      console.error('Error sending role request:', err);
+      setDialogState({
+        isOpen: true,
+        title: 'Error',
+        message: 'Error sending role request',
+        isConfirm: false,
+      });
+      setIsRequestDisabled(false);
+    } finally {
+      setIsRequestLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (cooldownSeconds > 0) {
+      const timer = setInterval(() => {
+        setCooldownSeconds((prev) => {
+          if (prev <= 1) {
+            setIsRequestDisabled(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [cooldownSeconds]);
+
   const filteredUsers = users.filter(
     (user) =>
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.role.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Calculate number of team members with role 'anggota'
-  const teamMembersCount = users.filter(user => user.role === 'anggota').length;
+  const teamMembersCount = users.filter((user) => user.role === 'anggota').length;
 
-  // Process project data for chart
   const processProjectData = () => {
     const monthCounts = {};
     projects.forEach((project) => {
@@ -345,7 +420,6 @@ export default function Dashboard() {
       monthCounts[monthYear] = (monthCounts[monthYear] || 0) + 1;
     });
 
-    // Generate last 12 months
     const labels = [];
     const data = [];
     const today = new Date();
@@ -386,38 +460,103 @@ export default function Dashboard() {
   }
 
   if (!isLoggedIn) {
-    return null; // Redirect handled by useEffect
+    return null;
   }
 
   if (userRole === 'user') {
     return (
       <div className="min-h-screen font-futura bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-gray-100 flex flex-col">
         <Navbar />
-        <main className="flex-grow flex items-center justify-center px-4 pt-16 sm:pt-20">
+        <main className="flex-grow flex flex-col items-center justify-center px-4 pt-24 sm:pt-28 md:pt-32">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-xl sm:text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 text-center"
+            className="text-xl sm:text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 text-center mb-6"
           >
             Welcome to CoreDev
           </motion.h1>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex flex-col sm:flex-row gap-3 items-center relative"
+          >
+            <select
+              value={requestRole}
+              onChange={(e) => setRequestRole(e.target.value)}
+              className="w-full sm:w-48 px-4 py-2 rounded-lg bg-gray-700/50 text-gray-100 border border-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              aria-label="Select requested role"
+              disabled={isRequestLoading || isRequestDisabled}
+            >
+              <option value="anggota">Anggota</option>
+              <option value="dosen">Dosen</option>
+            </select>
+            <motion.button
+              whileHover={{ scale: (isRequestLoading || isRequestDisabled) ? 1 : 1.05 }}
+              whileTap={{ scale: (isRequestLoading || isRequestDisabled) ? 1 : 0.95 }}
+              onClick={handleRequestRole}
+              disabled={isRequestLoading || isRequestDisabled}
+              className={`w-full sm:w-auto px-4 py-2 text-white rounded-lg font-semibold text-sm relative overflow-hidden ${
+                isRequestLoading || isRequestDisabled
+                  ? 'bg-gray-600 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-600 to-blue-400'
+              }`}
+            >
+              <AnimatePresence>
+                {isRequestLoading ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center justify-center"
+                  >
+                    <LoadingSpinner />
+                  </motion.div>
+                ) : (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    {isRequestDisabled && cooldownSeconds > 0
+                      ? `Wait ${cooldownSeconds}s`
+                      : 'Request Role'}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          </motion.div>
         </main>
+        <CustomDialog
+          isOpen={dialogState.isOpen}
+          onClose={() => setDialogState({ ...dialogState, isOpen: false })}
+          title={dialogState.title}
+          message={dialogState.message}
+          onConfirm={dialogState.onConfirm}
+          isConfirm={dialogState.isConfirm}
+        />
         <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen font-futura bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-gray-100 transition-colors duration-500">
+    <div className="min-h-screen font-futura bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-gray-100">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute w-48 sm:w-64 md:w-96 h-48 sm:h-64 md:h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ top: '10%', left: '10%' }}></div>
-        <div className="absolute w-48 sm:w-64 md:w-96 h-48 sm:h-64 md:h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000" style={{ bottom: '20%', right: '15%' }}></div>
+        <div
+          className="absolute w-48 sm:w-64 md:w-96 h-48 sm:h-64 md:h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"
+          style={{ top: '10%', left: '10%' }}
+        ></div>
+        <div
+          className="absolute w-48 sm:w-64 md:w-96 h-48 sm:h-64 md:h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"
+          style={{ bottom: '20%', right: '15%' }}
+        ></div>
       </div>
 
       <Navbar />
 
-      <main className="p-4 sm:p-6 md:p-8 pt-20 sm:pt-24 md:pt-28 lg:pt-32 max-w-7xl mx-auto relative z-10">
+      <main className="p-4 sm:p-6 md:p-8 pt-28 sm:pt-32 md:pt-36 lg:pt-40 max-w-7xl mx-auto relative z-10">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -450,6 +589,24 @@ export default function Dashboard() {
           >
             <FolderPlus size={18} />
             Add Project
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-600 to-green-400 text-white rounded-lg font-semibold text-sm sm:text-base shadow-md w-full sm:w-auto"
+            onClick={() => router.push('/list-project')}
+          >
+            <FileText size={18} />
+            List Project
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-teal-600 to-teal-400 text-white rounded-lg font-semibold text-sm sm:text-base shadow-md w-full sm:w-auto"
+            onClick={() => router.push('/list-member')}
+          >
+            <Users size={18} />
+            List Member
           </motion.button>
         </motion.div>
 
@@ -537,7 +694,7 @@ export default function Dashboard() {
             />
           </div>
           <div className="bg-gray-800/80 rounded-lg border border-blue-500/20 shadow-md overflow-x-auto">
-            <table className="w-full text-left min-w-[500px] sm:min-w-[600px]">
+            <table className="w-full text-left min-w-[500px]">
               <thead>
                 <tr className="border-b border-blue-500/20">
                   <th className="p-3 sm:p-4 text-gray-300 text-xs sm:text-sm">Email</th>

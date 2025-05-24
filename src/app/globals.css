@@ -20,13 +20,25 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
-/* Ensure smooth transitions for theme changes */
 html {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Dark mode styles */
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
+}
+
+.hide-scrollbar-desktop {
+  overflow-y: auto;
+}
+
+@media (min-width: 1024px) {
+  .hide-scrollbar-desktop::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar-desktop {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 }
