@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react'; // Import Suspense
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { UserPlus, X, AlertCircle, Pencil } from 'lucide-react';
@@ -14,7 +14,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-// Custom Dialog Component
+// Custom Dialog Component (unchanged)
 const CustomDialog = ({ isOpen, onClose, title, message, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel', isConfirm = false }) => {
   return (
     <AnimatePresence>
@@ -83,7 +83,8 @@ const CustomDialog = ({ isOpen, onClose, title, message, onConfirm, confirmText 
   );
 };
 
-export default function EditTeamMember() {
+// Component to handle useSearchParams with Suspense
+function EditTeamMemberContent() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -878,5 +879,24 @@ export default function EditTeamMember() {
 
       <Footer />
     </div>
+  );
+}
+
+// Main page component with Suspense
+export default function EditTeamMember() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
+          ></motion.div>
+        </div>
+      }
+    >
+      <EditTeamMemberContent />
+    </Suspense>
   );
 }
