@@ -2,7 +2,7 @@
 
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=flat-square&logo=vercel)](https://vercel.com)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+<!-- [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) -->
 
 Welcome to **CoreDev**, a sleek and modern team portfolio built with **Next.js** to showcase our projects, skills, and expertise. This project is designed to highlight our team's creativity and technical prowess with a fast, responsive, and user-friendly interface.
 
