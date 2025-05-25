@@ -27,7 +27,7 @@ Welcome to **CoreDev**, a sleek and modern team portfolio built with **Next.js**
 
 ## 📸 Screenshots
 
-![CoreDev Homepage](https://via.placeholder.com/800x400?text=CoreDev+Homepage)
+![CoreDev Homepage](./public/screenshoot%201.png)
 *CoreDev Homepage - Clean and modern design*
 
 ## 🏁 Getting Started
