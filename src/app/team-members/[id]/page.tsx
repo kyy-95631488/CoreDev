@@ -41,23 +41,18 @@ const formatRole = (role: string): string => {
     .join(' ');
 };
 
-// Function to convert text patterns to symbols/emojis
 const formatTextWithSymbols = (text: string): string => {
-  let formattedText = text
+
+  const formattedText = text
     .replace(/:\)/g, '😊')
     .replace(/:\(/g, '😔')
     .replace(/<3/g, '❤️')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\n/g, '<br />')
-    .replace(/\[paragraph\]/g, '</p><p>');
+    .replace(/\n/g, ' ')
+    .replace(/\[paragraph\]/g, ' ');
 
-  // Wrap the entire text in a paragraph tag if not already wrapped
-  if (!formattedText.startsWith('<p>')) {
-    formattedText = `<p>${formattedText}</p>`;
-  }
-
-  return formattedText;
+  return `<p>${formattedText}</p>`;
 };
 
 export default function TeamMemberDetail() {
@@ -76,7 +71,7 @@ export default function TeamMemberDetail() {
       }
       setIsLoading(true);
       try {
-        const response = await fetch(`https://hendriansyah.xyz/v1/auth/get-team/?id=${memberId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-team/?id=${memberId}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -155,6 +150,9 @@ export default function TeamMemberDetail() {
     );
   }
 
+  const aboutContent = formatTextWithSymbols(teamMember.description);
+  const storyContent = formatTextWithSymbols(teamMember.short_story);
+
   return (
     <div className="min-h-screen font-sans bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 text-white">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -212,7 +210,7 @@ export default function TeamMemberDetail() {
             <h2 className="text-lg font-semibold text-indigo-400 mb-4">About</h2>
             <div className="overflow-y-auto max-h-[300px] pr-2 scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-gray-800">
               <div className="text-sm text-gray-300 leading-relaxed">
-                {parse(formatTextWithSymbols(teamMember.description))}
+                {parse(aboutContent)}
               </div>
             </div>
           </motion.div>
@@ -248,7 +246,7 @@ export default function TeamMemberDetail() {
             <h2 className="text-lg font-semibold text-indigo-400 mb-4">Story</h2>
             <div className="overflow-y-auto max-h-[300px] pr-2 scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-gray-800">
               <div className="text-sm text-gray-300 leading-relaxed">
-                {parse(formatTextWithSymbols(teamMember.short_story))}
+                {parse(storyContent)}
               </div>
             </div>
           </motion.div>

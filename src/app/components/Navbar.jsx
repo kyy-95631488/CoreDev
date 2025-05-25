@@ -16,14 +16,13 @@ export default function Navbar() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Check for valid session token on mount
   useEffect(() => {
     const checkSession = async () => {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         setIsLoading(true);
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/verify-session/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -49,18 +48,17 @@ export default function Navbar() {
     checkSession();
   }, []);
 
-  // Handle logout
   const handleLogout = async () => {
     setIsLoading(true);
     try {
-      await fetch('https://hendriansyah.xyz/v1/auth/logout/', {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_token: localStorage.getItem('session_token') }),
       });
 
       localStorage.removeItem('session_token');
-      localStorage.removeItem('rememberedEmail');
+      // localStorage.removeItem('rememberedEmail');
       setIsLoggedIn(false);
       router.push('/');
     } catch (err) {
@@ -70,7 +68,6 @@ export default function Navbar() {
     }
   };
 
-  // Button animation variants
   const buttonVariants = {
     hover: {
       scale: 1.05,
@@ -88,7 +85,6 @@ export default function Navbar() {
     }
   };
 
-  // Icon animation for buttons
   const iconVariants = {
     initial: { rotate: 0, scale: 1 },
     hover: { 

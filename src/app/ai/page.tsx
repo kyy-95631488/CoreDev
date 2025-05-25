@@ -49,12 +49,11 @@ const formatAIResponse = async (text: string): Promise<string> => {
     console.warn('Failed to parse Markdown:', error);
   }
 
-  // Only sanitize if in browser environment
   if (typeof window !== 'undefined') {
     const { default: DOMPurify } = await import('dompurify');
     return DOMPurify.sanitize(formattedText);
   }
-  return formattedText; // Return unsanitized on server (safe fallback)
+  return formattedText;
 };
 
 const formatUserInput = (text: string): string => {
@@ -98,7 +97,6 @@ export default function AIPage() {
     },
   ]);
 
-  // Initialize the assistant message with formatAIResponse
   useEffect(() => {
     const initializeMessages = async () => {
       const initialMessage = await formatAIResponse(

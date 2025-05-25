@@ -15,17 +15,16 @@ export default function LoginPage() {
   const [dialog, setDialog] = useState({ isOpen: false, message: '', type: 'error' });
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0); // State for cooldown timer
+  const [resendCooldown, setResendCooldown] = useState(0);
   const router = useRouter();
 
-  // Check for valid session token on component mount
   useEffect(() => {
     const checkSession = async () => {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         setIsLoading(true);
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/verify-session/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -45,7 +44,6 @@ export default function LoginPage() {
 
     checkSession();
 
-    // Load remembered email
     const storedEmail = localStorage.getItem('rememberedEmail');
     if (storedEmail) {
       setEmail(storedEmail);
@@ -53,7 +51,6 @@ export default function LoginPage() {
     }
   }, [router]);
 
-  // Handle cooldown timer
   useEffect(() => {
     if (resendCooldown > 0) {
       const timer = setInterval(() => {
@@ -69,7 +66,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://hendriansyah.xyz/v1/auth/login/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'login', email, password }),
@@ -120,7 +117,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://hendriansyah.xyz/v1/auth/login/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'verify', email, code: verificationCode }),
@@ -168,10 +165,10 @@ export default function LoginPage() {
   const handleResendCode = async () => {
     setDialog({ isOpen: false, message: '', type: 'error' });
     setIsLoading(true);
-    setResendCooldown(30); // Set 30-second cooldown
+    setResendCooldown(30);
 
     try {
-      const response = await fetch('https://hendriansyah.xyz/v1/auth/login/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'resend', email }),

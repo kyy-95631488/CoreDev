@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { FileText, Trash2, Edit2, X } from 'lucide-react';
+import { Trash2, Edit2, X } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -92,13 +92,12 @@ export default function ListProject() {
   });
   const router = useRouter();
 
-  // Check session token and fetch role
   useEffect(() => {
     const checkSession = async () => {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/verify-session/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -126,7 +125,6 @@ export default function ListProject() {
     checkSession();
   }, [router]);
 
-  // Fetch projects
   useEffect(() => {
     if (userRole === 'anggota' || userRole === 'dosen') {
       const fetchProjects = async () => {
@@ -135,7 +133,7 @@ export default function ListProject() {
           if (!sessionToken) {
             throw new Error('No session token found');
           }
-          const response = await fetch(`https://hendriansyah.xyz/v1/auth/get-projects/?session_token=${encodeURIComponent(sessionToken)}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-projects/?session_token=${encodeURIComponent(sessionToken)}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           });
@@ -164,7 +162,6 @@ export default function ListProject() {
     }
   }, [userRole]);
 
-  // Handle delete project
   const handleDeleteProject = (projectId) => {
     setDialogState({
       isOpen: true,
@@ -174,7 +171,7 @@ export default function ListProject() {
       onConfirm: async () => {
         try {
           const sessionToken = localStorage.getItem('session_token');
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/delete-project/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/delete-project/`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken, project_id: projectId }),
@@ -209,7 +206,6 @@ export default function ListProject() {
     });
   };
 
-  // Filter projects based on search term
   const filteredProjects = projects.filter(
     (project) =>
       project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -3,19 +3,17 @@
 import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { UserPlus, X, AlertCircle, Pencil } from 'lucide-react';
+import { X, AlertCircle, Pencil } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import parse from 'html-react-parser';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-// Initialize Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-// Function to convert text patterns to symbols/emojis and HTML
 const formatTextWithSymbols = (text) => {
   let formattedText = text
     .replace(/:\)/g, '😊')
@@ -26,7 +24,6 @@ const formatTextWithSymbols = (text) => {
     .replace(/\n/g, '<br />')
     .replace(/\[paragraph\]/g, '</p><p>');
 
-  // Wrap the entire text in a paragraph tag if not already wrapped
   if (!formattedText.startsWith('<p>')) {
     formattedText = `<p>${formattedText}</p>`;
   }
@@ -34,7 +31,6 @@ const formatTextWithSymbols = (text) => {
   return formattedText;
 };
 
-// Custom Dialog Component
 const CustomDialog = ({ isOpen, onClose, title, message, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel', isConfirm = false }) => {
   return (
     <AnimatePresence>
@@ -103,7 +99,6 @@ const CustomDialog = ({ isOpen, onClose, title, message, onConfirm, confirmText 
   );
 };
 
-// Component to handle useSearchParams with Suspense
 function EditTeamMemberContent() {
   const [formData, setFormData] = useState({
     name: '',
@@ -170,13 +165,12 @@ function EditTeamMemberContent() {
     'Testing',
   ];
 
-  // Check session token and fetch role
   useEffect(() => {
     const checkSession = async () => {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/verify-session/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -203,14 +197,11 @@ function EditTeamMemberContent() {
     checkSession();
   }, [router]);
 
-  // Function to convert HTML back to raw text for editing
   const convertHtmlToRawText = (html) => {
-    // Create a temporary DOM element to parse HTML
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     let text = doc.body.textContent || '';
 
-    // Convert HTML tags and entities back to markdown-like syntax
     text = text
       .replace(/😊/g, ':)')
       .replace(/😔/g, ':(')
@@ -218,10 +209,8 @@ function EditTeamMemberContent() {
       .replace(/\n/g, '\n')
       .replace(/<\/p><p>/g, '[paragraph]');
 
-    // Remove any remaining <p> tags
     text = text.replace(/<\/?p>/g, '');
-
-    // Convert <strong> and <em> back to markdown
+    
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
     tempDiv.querySelectorAll('strong').forEach((el) => {
@@ -234,7 +223,6 @@ function EditTeamMemberContent() {
     return tempDiv.textContent || text;
   };
 
-  // Fetch member data
   useEffect(() => {
     if (isLoggedIn && memberEmail) {
       const fetchMemberData = async () => {
@@ -957,7 +945,6 @@ function EditTeamMemberContent() {
   );
 }
 
-// Main page component with Suspense
 export default function EditTeamMember() {
   return (
     <Suspense

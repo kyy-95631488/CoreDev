@@ -3,12 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Users, X, Trash2, AlertCircle, Linkedin, Github, Instagram, MessageCircle, Globe, Pencil } from 'lucide-react';
+import { X, Trash2, Linkedin, Github, Instagram, MessageCircle, Globe, Pencil } from 'lucide-react';
 import parse from 'html-react-parser';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-// Custom Dialog Component
 const CustomDialog = ({ isOpen, onClose, title, message, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel', isConfirm = false }) => {
   return (
     <AnimatePresence>
@@ -94,13 +93,12 @@ export default function ListTeamMember() {
   const router = useRouter();
   const MAX_DESCRIPTION_LENGTH = 100;
 
-  // Check session token and fetch role
   useEffect(() => {
     const checkSession = async () => {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/verify-session/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -128,7 +126,6 @@ export default function ListTeamMember() {
     checkSession();
   }, [router]);
 
-  // Fetch team members
   useEffect(() => {
     if (userRole === 'anggota' || userRole === 'dosen') {
       const fetchTeamMembers = async () => {
@@ -137,7 +134,7 @@ export default function ListTeamMember() {
           if (!sessionToken) {
             throw new Error('No session token found');
           }
-          const response = await fetch(`https://hendriansyah.xyz/v1/auth/get-team-members-list/?session_token=${encodeURIComponent(sessionToken)}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-team-members-list/?session_token=${encodeURIComponent(sessionToken)}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           });
@@ -167,7 +164,6 @@ export default function ListTeamMember() {
     }
   }, [userRole]);
 
-  // Handle delete team member
   const handleDeleteMember = (email) => {
     setDialogState({
       isOpen: true,
@@ -177,7 +173,7 @@ export default function ListTeamMember() {
       onConfirm: async () => {
         try {
           const sessionToken = localStorage.getItem('session_token');
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/delete-team-member/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/delete-team-member/`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken, email }),
@@ -212,12 +208,10 @@ export default function ListTeamMember() {
     });
   };
 
-  // Handle edit team member
   const handleEditMember = (member) => {
     router.push(`/edit-team-member?email=${encodeURIComponent(member.email)}`);
   };
 
-  // Toggle read more/less for a specific member
   const toggleDescription = (email) => {
     setExpandedDescriptions((prev) => ({
       ...prev,
@@ -225,7 +219,6 @@ export default function ListTeamMember() {
     }));
   };
 
-  // Filter team members based on search term
   const filteredMembers = teamMembers.filter(
     (member) =>
       member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -295,7 +288,7 @@ export default function ListTeamMember() {
           {filteredMembers.length > 0 ? (
             filteredMembers.map((member, index) => {
               const isExpanded = expandedDescriptions[member.email];
-              const strippedDescription = member.description.replace(/<[^>]+>/g, ''); // Strip HTML for length check
+              const strippedDescription = member.description.replace(/<[^>]+>/g, '');
               const isLongDescription = strippedDescription.length > MAX_DESCRIPTION_LENGTH;
               const displayDescription = isExpanded || !isLongDescription
                 ? member.description

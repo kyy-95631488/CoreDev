@@ -9,13 +9,11 @@ import parse from 'html-react-parser';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-// Initialize Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-// Function to convert text patterns to symbols/emojis and HTML
 const formatTextWithSymbols = (text) => {
   let formattedText = text
     .replace(/:\)/g, '😊')
@@ -26,7 +24,6 @@ const formatTextWithSymbols = (text) => {
     .replace(/\n/g, '<br />')
     .replace(/\[paragraph\]/g, '</p><p>');
 
-  // Wrap the entire text in a paragraph tag if not already wrapped
   if (!formattedText.startsWith('<p>')) {
     formattedText = `<p>${formattedText}</p>`;
   }
@@ -34,7 +31,6 @@ const formatTextWithSymbols = (text) => {
   return formattedText;
 };
 
-// Custom Dialog Component
 const CustomDialog = ({ isOpen, onClose, title, message, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel', isConfirm = false }) => {
   return (
     <AnimatePresence>
@@ -166,13 +162,12 @@ export default function AddTeamMember() {
     'Testing',
   ];
 
-  // Check session token and fetch role
   useEffect(() => {
     const checkSession = async () => {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/verify-session/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -339,7 +334,7 @@ export default function AddTeamMember() {
       formDataToSend.append('photo', photoUrl);
       formDataToSend.append('skills', JSON.stringify(formData.skills));
 
-      const response = await fetch('https://hendriansyah.xyz/v1/auth/add-team-member/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/add-team-member/`, {
         method: 'POST',
         body: formDataToSend,
       });

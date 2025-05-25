@@ -58,7 +58,7 @@ export default function Home() {
       if (sessionToken) {
         setIsLoading(true);
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/verify-session/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -88,7 +88,7 @@ export default function Home() {
     const fetchProjects = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('https://hendriansyah.xyz/v1/auth/get-projects-show/', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-projects-show/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -112,7 +112,7 @@ export default function Home() {
     const fetchTeamMembers = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('https://hendriansyah.xyz/v1/auth/get-team-members/', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-team-members/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });

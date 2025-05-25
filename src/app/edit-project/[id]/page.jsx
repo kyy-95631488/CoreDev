@@ -129,13 +129,12 @@ export default function EditProject() {
     'Kubernetes',
   ];
 
-  // Check session and fetch project data
   useEffect(() => {
     const checkSessionAndFetchProject = async () => {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/verify-session/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -144,8 +143,7 @@ export default function EditProject() {
           if (response.ok && data.valid) {
             setIsLoggedIn(true);
             setUserRole(data.role);
-            // Fetch project data
-            const projectResponse = await fetch(`https://hendriansyah.xyz/v1/auth/get-project/?session_token=${encodeURIComponent(sessionToken)}&project_id=${id}`, {
+            const projectResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-project/?session_token=${encodeURIComponent(sessionToken)}&project_id=${id}`, {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
             });
@@ -192,12 +190,11 @@ export default function EditProject() {
     checkSessionAndFetchProject();
   }, [router, id]);
 
-  // Fetch users for team member selection
   useEffect(() => {
     if (userRole === 'anggota' || userRole === 'dosen') {
       const fetchUsers = async () => {
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/get-users/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-users/`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           });
@@ -226,7 +223,6 @@ export default function EditProject() {
     }
   }, [userRole]);
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === 'frameworks') {
@@ -237,7 +233,6 @@ export default function EditProject() {
     }
   };
 
-  // Handle thumbnail selection
   const handleThumbnailChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -264,7 +259,6 @@ export default function EditProject() {
     }
   };
 
-  // Handle team member selection
   const handleTeamMemberChange = (email) => {
     setFormData((prev) => ({
       ...prev,
@@ -274,7 +268,6 @@ export default function EditProject() {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -298,7 +291,7 @@ export default function EditProject() {
     }
 
     try {
-      const response = await fetch('https://hendriansyah.xyz/v1/auth/update-project/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/update-project/`, {
         method: 'PUT',
         body: submissionData,
       });

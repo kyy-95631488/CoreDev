@@ -8,13 +8,11 @@ import { createClient } from '@supabase/supabase-js';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-// Initialize Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-// Custom Dialog Component
 const CustomDialog = ({ isOpen, onClose, title, message, isConfirm = false, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel' }) => {
   return (
     <AnimatePresence>
@@ -109,7 +107,6 @@ export default function AddProject() {
   });
   const router = useRouter();
 
-  // List of frameworks
   const frameworkOptions = [
     'Java NetBeans',
     'Java Android',
@@ -137,13 +134,12 @@ export default function AddProject() {
     'Kubernetes',
   ];
 
-  // Check session token and fetch role
   useEffect(() => {
     const checkSession = async () => {
       const sessionToken = localStorage.getItem('session_token');
       if (sessionToken) {
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/verify-session/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/verify-session/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -171,12 +167,11 @@ export default function AddProject() {
     checkSession();
   }, [router]);
 
-  // Fetch users for team member selection
   useEffect(() => {
     if (userRole === 'anggota' || userRole === 'dosen') {
       const fetchUsers = async () => {
         try {
-          const response = await fetch('https://hendriansyah.xyz/v1/auth/get-users/', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-users/`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           });
@@ -205,19 +200,6 @@ export default function AddProject() {
     }
   }, [userRole]);
 
-  // Handle theme
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialDarkMode = savedTheme ? savedTheme === 'dark' : prefersDark;
-    if (initialDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === 'frameworks') {
@@ -228,7 +210,6 @@ export default function AddProject() {
     }
   };
 
-  // Handle thumbnail selection
   const handleThumbnailChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -256,7 +237,6 @@ export default function AddProject() {
     }
   };
 
-  // Handle team member selection
   const handleTeamMemberChange = (email) => {
     setFormData((prev) => ({
       ...prev,
@@ -266,7 +246,6 @@ export default function AddProject() {
     }));
   };
 
-  // Upload thumbnail to Supabase
   const uploadThumbnail = async (file) => {
     try {
       const fileExt = file.name.split('.').pop();
@@ -293,7 +272,6 @@ export default function AddProject() {
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -328,7 +306,7 @@ export default function AddProject() {
     submissionData.append('thumbnail_path', thumbnailUrl);
 
     try {
-      const response = await fetch('https://hendriansyah.xyz/v1/auth/add-project/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/add-project/`, {
         method: 'POST',
         body: submissionData,
       });

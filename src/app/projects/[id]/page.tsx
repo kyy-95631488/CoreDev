@@ -9,7 +9,6 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import Link from 'next/link';
 
-// Define the Project interface
 interface Project {
   id: number;
   name: string;
@@ -28,12 +27,11 @@ export default function ProjectDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch project details
   useEffect(() => {
     const fetchProject = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`https://hendriansyah.xyz/v1/auth/get-project-by-id/?id=${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-project-by-id/?id=${id}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -61,7 +59,6 @@ export default function ProjectDetail() {
     }
   }, [id]);
 
-  // Format date
   const formatDate = (date: string | null) => {
     if (!date) return 'Ongoing';
     return new Date(date).toLocaleDateString('en-US', {
