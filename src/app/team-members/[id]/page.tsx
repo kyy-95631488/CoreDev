@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Github, Linkedin, Instagram, Globe, Phone } from 'lucide-react';
+import parse from 'html-react-parser';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 
@@ -38,6 +39,25 @@ const formatRole = (role: string): string => {
     .split('_')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+};
+
+// Function to convert text patterns to symbols/emojis
+const formatTextWithSymbols = (text: string): string => {
+  let formattedText = text
+    .replace(/:\)/g, '😊')
+    .replace(/:\(/g, '😔')
+    .replace(/<3/g, '❤️')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br />')
+    .replace(/\[paragraph\]/g, '</p><p>');
+
+  // Wrap the entire text in a paragraph tag if not already wrapped
+  if (!formattedText.startsWith('<p>')) {
+    formattedText = `<p>${formattedText}</p>`;
+  }
+
+  return formattedText;
 };
 
 export default function TeamMemberDetail() {
@@ -144,7 +164,6 @@ export default function TeamMemberDetail() {
 
       <Navbar />
 
-      {/* Adjusted padding-top to prevent navbar overlap */}
       <main className="p-4 sm:p-6 md:p-8 pt-24 sm:pt-28 md:pt-32 lg:pt-36 max-w-6xl mx-auto relative z-10 min-h-screen">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
@@ -192,7 +211,9 @@ export default function TeamMemberDetail() {
           >
             <h2 className="text-lg font-semibold text-indigo-400 mb-4">About</h2>
             <div className="overflow-y-auto max-h-[300px] pr-2 scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-gray-800">
-              <p className="text-sm text-gray-300 leading-relaxed">{teamMember.description}</p>
+              <div className="text-sm text-gray-300 leading-relaxed">
+                {parse(formatTextWithSymbols(teamMember.description))}
+              </div>
             </div>
           </motion.div>
 
@@ -226,7 +247,9 @@ export default function TeamMemberDetail() {
           >
             <h2 className="text-lg font-semibold text-indigo-400 mb-4">Story</h2>
             <div className="overflow-y-auto max-h-[300px] pr-2 scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-gray-800">
-              <p className="text-sm text-gray-300 leading-relaxed">{teamMember.short_story}</p>
+              <div className="text-sm text-gray-300 leading-relaxed">
+                {parse(formatTextWithSymbols(teamMember.short_story))}
+              </div>
             </div>
           </motion.div>
 

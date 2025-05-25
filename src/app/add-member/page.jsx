@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { UserPlus, X, AlertCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import parse from 'html-react-parser';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -13,6 +14,25 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
+
+// Function to convert text patterns to symbols/emojis and HTML
+const formatTextWithSymbols = (text) => {
+  let formattedText = text
+    .replace(/:\)/g, '😊')
+    .replace(/:\(/g, '😔')
+    .replace(/<3/g, '❤️')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br />')
+    .replace(/\[paragraph\]/g, '</p><p>');
+
+  // Wrap the entire text in a paragraph tag if not already wrapped
+  if (!formattedText.startsWith('<p>')) {
+    formattedText = `<p>${formattedText}</p>`;
+  }
+
+  return formattedText;
+};
 
 // Custom Dialog Component
 const CustomDialog = ({ isOpen, onClose, title, message, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel', isConfirm = false }) => {
@@ -179,18 +199,6 @@ export default function AddTeamMember() {
     };
     checkSession();
   }, [router]);
-
-  // Handle theme
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialDarkMode = savedTheme ? savedTheme === 'dark' : prefersDark;
-    if (initialDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -617,10 +625,22 @@ export default function AddTeamMember() {
                   value={formData.description}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 rounded-lg bg-gray-700/50 text-gray-100 border border-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  placeholder="Enter a brief description"
+                  placeholder="Enter a brief description (e.g., I love coding! :) Use **bold** for emphasis, [paragraph] for new paragraphs)"
                   aria-label="Description"
                   rows="4"
                 />
+                {formData.description && (
+                  <div className="mt-2 p-3 bg-gray-900/50 rounded-lg">
+                    <p className="text-sm text-gray-400">Preview:</p>
+                    <div className="text-sm text-gray-300 leading-relaxed">
+                      {parse(formatTextWithSymbols(formData.description))}
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-gray-400 mt-1">
+                  Formatting: Gunakan <code>[paragraph]</code> untuk paragraf baru, <code>**text**</code> untuk teks tebal, <code>*text*</code> untuk miring, <code>:)</code> untuk 😊, <code>:(</code> untuk 😔, dan <code>&lt;3</code> untuk ❤️
+                </p>
+
                 {errors.description && (
                   <motion.p
                     initial={{ opacity: 0 }}
@@ -642,10 +662,22 @@ export default function AddTeamMember() {
                   value={formData.shortStory}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 rounded-lg bg-gray-700/50 text-gray-100 border border-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  placeholder="Enter a short story or bio"
+                  placeholder="Enter a short story or bio (e.g., My journey began with **passion**! <3 Use [paragraph] for new paragraphs)"
                   aria-label="Short Story"
                   rows="4"
                 />
+                {formData.shortStory && (
+                  <div className="mt-2 p-3 bg-gray-900/50 rounded-lg">
+                    <p className="text-sm text-gray-400">Preview:</p>
+                    <div className="text-sm text-gray-300 leading-relaxed">
+                      {parse(formatTextWithSymbols(formData.shortStory))}
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-gray-400 mt-1">
+                  Formatting: Use <code>[paragraph]</code> for new paragraphs, <code>**text**</code> for bold, <code>*text*</code> for italic, <code>:)</code> for 😊, <code>:(</code> for 😔, <code>&lt;3</code> for ❤️
+                </p>
+
                 {errors.shortStory && (
                   <motion.p
                     initial={{ opacity: 0 }}

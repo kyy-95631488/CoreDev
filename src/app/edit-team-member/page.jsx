@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react'; // Import Suspense
+import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { UserPlus, X, AlertCircle, Pencil } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import parse from 'html-react-parser';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -14,7 +15,26 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-// Custom Dialog Component (unchanged)
+// Function to convert text patterns to symbols/emojis and HTML
+const formatTextWithSymbols = (text) => {
+  let formattedText = text
+    .replace(/:\)/g, '😊')
+    .replace(/:\(/g, '😔')
+    .replace(/<3/g, '❤️')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br />')
+    .replace(/\[paragraph\]/g, '</p><p>');
+
+  // Wrap the entire text in a paragraph tag if not already wrapped
+  if (!formattedText.startsWith('<p>')) {
+    formattedText = `<p>${formattedText}</p>`;
+  }
+
+  return formattedText;
+};
+
+// Custom Dialog Component
 const CustomDialog = ({ isOpen, onClose, title, message, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel', isConfirm = false }) => {
   return (
     <AnimatePresence>
@@ -183,6 +203,37 @@ function EditTeamMemberContent() {
     checkSession();
   }, [router]);
 
+  // Function to convert HTML back to raw text for editing
+  const convertHtmlToRawText = (html) => {
+    // Create a temporary DOM element to parse HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    let text = doc.body.textContent || '';
+
+    // Convert HTML tags and entities back to markdown-like syntax
+    text = text
+      .replace(/😊/g, ':)')
+      .replace(/😔/g, ':(')
+      .replace(/❤️/g, '<3')
+      .replace(/\n/g, '\n')
+      .replace(/<\/p><p>/g, '[paragraph]');
+
+    // Remove any remaining <p> tags
+    text = text.replace(/<\/?p>/g, '');
+
+    // Convert <strong> and <em> back to markdown
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    tempDiv.querySelectorAll('strong').forEach((el) => {
+      el.outerHTML = `**${el.textContent}**`;
+    });
+    tempDiv.querySelectorAll('em').forEach((el) => {
+      el.outerHTML = `*${el.textContent}*`;
+    });
+
+    return tempDiv.textContent || text;
+  };
+
   // Fetch member data
   useEffect(() => {
     if (isLoggedIn && memberEmail) {
@@ -204,8 +255,8 @@ function EditTeamMemberContent() {
                 name: member.name || '',
                 email: member.email || '',
                 role: member.role || 'android_developer',
-                description: member.description || '',
-                shortStory: member.short_story || '',
+                description: convertHtmlToRawText(member.description || ''),
+                shortStory: convertHtmlToRawText(member.short_story || ''),
                 linkedin: member.linkedin || '',
                 github: member.github || '',
                 instagram: member.instagram || '',
@@ -667,10 +718,22 @@ function EditTeamMemberContent() {
                   value={formData.description}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 rounded-lg bg-gray-700/50 text-gray-100 border border-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  placeholder="Enter a brief description"
+                  placeholder="Enter a brief description (e.g., I love coding! :) Use **bold** for emphasis, [paragraph] for new paragraphs)"
                   aria-label="Description"
                   rows="4"
                 />
+                {formData.description && (
+                  <div className="mt-2 p-3 bg-gray-900/50 rounded-lg">
+                    <p className="text-sm text-gray-400">Preview:</p>
+                    <div className="text-sm text-gray-300 leading-relaxed">
+                      {parse(formatTextWithSymbols(formData.description))}
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-gray-400 mt-1">
+                  Formatting: Gunakan <code>[paragraph]</code> untuk paragraf baru, <code>**teks**</code> untuk **bold**, <code>*teks*</code> untuk *italic*, <code>:)</code> untuk 😊, <code>:(</code> untuk 😔, <code>&lt;3</code> untuk ❤️
+                </p>
+
                 {errors.description && (
                   <motion.p
                     initial={{ opacity: 0 }}
@@ -692,10 +755,22 @@ function EditTeamMemberContent() {
                   value={formData.shortStory}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 rounded-lg bg-gray-700/50 text-gray-100 border border-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  placeholder="Enter a short story or bio"
+                  placeholder="Enter a short story or bio (e.g., My journey began with **passion**! <3 Use [paragraph] for new paragraphs)"
                   aria-label="Short Story"
                   rows="4"
                 />
+                {formData.shortStory && (
+                  <div className="mt-2 p-3 bg-gray-900/50 rounded-lg">
+                    <p className="text-sm text-gray-400">Preview:</p>
+                    <div className="text-sm text-gray-300 leading-relaxed">
+                      {parse(formatTextWithSymbols(formData.shortStory))}
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-gray-400 mt-1">
+                  Formatting: Gunakan [paragraph] untuk paragraf baru, **teks** untuk bold, *teks* untuk italic, :) untuk 😊, :( untuk 😔, dan &lt;3 untuk ❤️
+                </p>
+
                 {errors.shortStory && (
                   <motion.p
                     initial={{ opacity: 0 }}

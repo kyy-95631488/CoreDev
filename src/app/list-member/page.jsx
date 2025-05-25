@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Users, X, Trash2, AlertCircle, Linkedin, Github, Instagram, MessageCircle, Globe, Pencil } from 'lucide-react';
+import parse from 'html-react-parser';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -294,10 +295,11 @@ export default function ListTeamMember() {
           {filteredMembers.length > 0 ? (
             filteredMembers.map((member, index) => {
               const isExpanded = expandedDescriptions[member.email];
-              const isLongDescription = member.description.length > MAX_DESCRIPTION_LENGTH;
+              const strippedDescription = member.description.replace(/<[^>]+>/g, ''); // Strip HTML for length check
+              const isLongDescription = strippedDescription.length > MAX_DESCRIPTION_LENGTH;
               const displayDescription = isExpanded || !isLongDescription
                 ? member.description
-                : `${member.description.slice(0, MAX_DESCRIPTION_LENGTH)}...`;
+                : member.description.slice(0, member.description.indexOf(' ', MAX_DESCRIPTION_LENGTH)) + '...';
 
               return (
                 <motion.div
@@ -345,8 +347,8 @@ export default function ListTeamMember() {
                     </div>
                   </div>
                   <p className="text-xs sm:text-sm text-gray-300 mb-2 capitalize">{member.role.replace('_', ' ')}</p>
-                  <p className="text-xs sm:text-sm text-gray-400 mb-4">
-                    {displayDescription}
+                  <div className="text-xs sm:text-sm text-gray-400 mb-4">
+                    {parse(displayDescription)}
                     {isLongDescription && (
                       <button
                         onClick={() => toggleDescription(member.email)}
@@ -355,7 +357,7 @@ export default function ListTeamMember() {
                         {isExpanded ? 'Read Less' : 'Read More'}
                       </button>
                     )}
-                  </p>
+                  </div>
                   <div className="mb-4">
                     <h4 className="text-xs font-medium text-gray-300 mb-1">Skills</h4>
                     <div className="flex flex-wrap gap-2">
