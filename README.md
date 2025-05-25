@@ -1,6 +1,6 @@
 # CoreDev - Team Portfolio Showcase
 
-[![Next.js](https://img.shields.io/badge/Next.js-14.2.15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.3.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=flat-square&logo=vercel)](https://vercel.com)
 <!-- [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) -->
 
