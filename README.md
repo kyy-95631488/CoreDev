@@ -85,10 +85,10 @@ We welcome contributions from the community! To contribute:
 5. Open a Pull Request.
 
 Please read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
-
+<!-- 
 ## 📜 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE). -->
 
 ## 📬 Contact Us
 
