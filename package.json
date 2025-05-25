@@ -19,6 +19,7 @@
     "lucide-react": "^0.511.0",
     "marked": "^15.0.12",
     "next": "15.1.8",
+    "prismjs": "^1.30.0",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0"
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
+    "@types/prismjs": "^1.26.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

@@ -217,7 +217,7 @@ export default function AIPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [useO3Mini, setUseO3Mini] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<'o3-mini' | 'x-ai/grok-3-beta'>('x-ai/grok-3-beta');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -279,9 +279,8 @@ export default function AIPage() {
                            input.toLowerCase().includes('java') ||
                            input.toLowerCase().includes('program') ||
                            input.toLowerCase().includes('coding');
-      const model = useO3Mini ? 'o3-mini' : 'x-ai/grok-3-beta';
       const response = await window.puter.ai.chat(input, {
-        model,
+        model: selectedModel, // Use the selected model
         stream: true,
       });
 
@@ -320,7 +319,7 @@ export default function AIPage() {
       setIsLoading(false);
       textareaRef.current?.focus();
     }
-  }, [input, useO3Mini]);
+  }, [input, selectedModel]);
 
   const handleKeyPress = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -373,7 +372,7 @@ export default function AIPage() {
         textarea:focus::placeholder {
           opacity: 0.7;
         }
-        /* Switch Styling */
+        /* Toggle Switch */
         .switch {
           position: relative;
           display: inline-block;
@@ -392,13 +391,13 @@ export default function AIPage() {
           left: 0;
           right: 0;
           bottom: 0;
-          background-color: #ccc;
+          background-color: #4b5563;
           transition: 0.4s;
           border-radius: 34px;
         }
         .slider:before {
           position: absolute;
-          content: "";
+          content: '';
           height: 26px;
           width: 26px;
           left: 4px;
@@ -412,6 +411,12 @@ export default function AIPage() {
         }
         input:checked + .slider:before {
           transform: translateX(26px);
+        }
+        .slider.round {
+          border-radius: 34px;
+        }
+        .slider.round:before {
+          border-radius: 50%;
         }
       `}</style>
       <div className="relative overflow-hidden">
@@ -446,18 +451,22 @@ export default function AIPage() {
             >
               Ask CoreDev anything and get insightful, witty responses instantly!
             </motion.p>
-            <div className="flex items-center justify-center mb-4">
+            <div className="flex items-center justify-end mb-4">
+              <span className="mr-3 text-sm text-gray-200">
+                {selectedModel === 'o3-mini' ? 'o3-mini' : 'Grok-3-Beta'}
+              </span>
               <label className="switch">
                 <input
                   type="checkbox"
-                  checked={useO3Mini}
-                  onChange={() => setUseO3Mini(!useO3Mini)}
+                  checked={selectedModel === 'o3-mini'}
+                  onChange={() =>
+                    setSelectedModel((prev) =>
+                      prev === 'o3-mini' ? 'x-ai/grok-3-beta' : 'o3-mini'
+                    )
+                  }
                 />
-                <span className="slider"></span>
+                <span className="slider round"></span>
               </label>
-              <span className="ml-3 text-gray-200 text-sm font-medium">
-                Use o3-mini model
-              </span>
             </div>
             <div className="rounded-2xl border border-teal-500/20 bg-gray-800/40 p-6 shadow-xl backdrop-blur-lg">
               {error && (
