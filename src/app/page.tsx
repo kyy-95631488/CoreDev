@@ -49,7 +49,7 @@ export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [expandedProjects, setExpandedProjects] = useState<number[]>([]);
-  const fullText = "Welcome to Our CoreDev";
+  const fullText = "Welcome to CoreDev Studio";
   const DESCRIPTION_LIMIT = 100;
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export default function Home() {
       } else {
         clearInterval(typingInterval);
       }
-    }, 100);
+    }, 80);
     return () => clearInterval(typingInterval);
   }, []);
 
@@ -153,64 +153,86 @@ export default function Home() {
     );
   };
 
+  const handleLearnMoreClick = (memberId: number, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent parent card from capturing click
+    console.log(`Learn More clicked for team member ID: ${memberId}`); // Debug log
+    window.location.href = `/team-members/${memberId}`; // Fallback navigation
+  };
+
   return (
-    <div className="min-h-screen font-futura transition-colors duration-500 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 dark:from-gray-900 dark:via-blue-950 dark:to-gray-900">
-      <div className="text-gray-100 relative overflow-hidden">
+    <div className="min-h-screen font-inter text-gray-100 bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 transition-colors duration-500">
+      <div className="relative overflow-hidden">
         {/* Animated background particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ top: '10%', left: '10%' }}></div>
-          <div className="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000" style={{ bottom: '20%', right: '15%' }}></div>
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <motion.div
+            className="absolute w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ top: '5%', left: '5%' }}
+          ></motion.div>
+          <motion.div
+            className="absolute w-80 h-80 bg-white-500/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+            style={{ bottom: '10%', right: '10%' }}
+          ></motion.div>
         </div>
 
         <Navbar />
 
         {/* Hero Section */}
-        <section className="min-h-screen flex items-center justify-center pt-16 px-4 relative">
+        <section className="min-h-screen flex items-center justify-center pt-20 px-4 sm:px-6 lg:px-8 z-10">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: 'easeOut' }}
-            className="text-center max-w-4xl mx-auto"
+            className="text-center max-w-5xl mx-auto"
           >
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-white-500 to-purple-500 animate-gradient">
               {typedText}
-              <span className="animate-pulse">|</span>
+              <span className="animate-pulse text-cyan-400">|</span>
             </h1>
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.5, duration: 0.8 }}
-              className="text-lg sm:text-xl md:text-2xl mb-8 text-gray-300"
+              transition={{ delay: 1.2, duration: 0.8 }}
+              className="text-lg sm:text-xl md:text-2xl mb-10 text-gray-200 max-w-2xl mx-auto"
             >
-              A dynamic team crafting innovative web solutions together
+              Crafting cutting-edge digital experiences with passion and precision
             </motion.p>
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-4 sm:gap-6">
               <motion.a
                 href="#projects"
-                whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)' }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full hover:from-blue-500 hover:to-purple-500 transition-all duration-300 text-base sm:text-lg shadow-lg"
+                whileHover={{ scale: isLoading ? 1 : 1.05 }}
+                whileTap={{ scale: isLoading ? 1 : 0.95 }}
+                className={`inline-block bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                aria-label="Discover Our Work"
+                onClick={(e) => isLoading && e.preventDefault()}
               >
-                Explore Our Work
+                Discover Our Work
               </motion.a>
               {isLoggedIn ? (
                 <motion.a
                   href="/dashboard"
-                  whileHover={{ scale: isLoading ? 1 : 1.1, boxShadow: isLoading ? 'none' : '0 0 20px rgba(59, 130, 246, 0.5)' }}
+                  whileHover={{ scale: isLoading ? 1 : 1.05 }}
                   whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-500 hover:to-purple-500 transition-all duration-300 text-base sm:text-lg shadow-lg"
+                  className={`inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  aria-label="Go to Dashboard"
+                  onClick={(e) => isLoading && e.preventDefault()}
                 >
-                  <LayoutDashboard size={20} className="inline" />
+                  <LayoutDashboard size={20} />
                   Dashboard
                 </motion.a>
               ) : (
                 <motion.a
                   href="/login"
-                  whileHover={{ scale: isLoading ? 1 : 1.1, boxShadow: isLoading ? 'none' : '0 0 20px rgba(59, 130, 246, 0.5)' }}
+                  whileHover={{ scale: isLoading ? 1 : 1.05 }}
                   whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full hover:from-purple-500 hover:to-blue-500 transition-all duration-300 text-base sm:text-lg shadow-lg"
+                  className={`inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-500 to-cyan-500 text-white rounded-full text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  aria-label="Join Us"
+                  onClick={(e) => isLoading && e.preventDefault()}
                 >
-                  <LogIn size={20} className="inline" />
+                  <LogIn size={20} />
                   Join Us
                 </motion.a>
               )}
@@ -219,54 +241,54 @@ export default function Home() {
         </section>
 
         {/* About Section */}
-        <section id="about" className="py-16 sm:py-20 max-w-5xl mx-auto px-4">
+        <section id="about" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
           <motion.h2
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-3xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500"
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-10 sm:mb-14 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500"
           >
-            About Our Team
+            Meet Our Team
           </motion.h2>
           {isLoading ? (
-            <div className="text-center text-gray-300">Loading team members...</div>
+            <div className="text-center text-gray-300 animate-pulse">Loading team members...</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
               {teamMembers.length === 0 ? (
                 <div className="text-center text-gray-300 col-span-full">No team members available.</div>
               ) : (
                 teamMembers.map((member, index) => (
                   <motion.div
                     key={member.id}
-                    initial={{ opacity: 0, y: 50 }}
+                    initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.2 }}
-                    className="flex flex-col items-center bg-gray-800/40 backdrop-blur-md rounded-lg p-6 border border-blue-500/30 shadow-lg hover:shadow-xl transition-all duration-300"
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    className="group relative bg-gray-800/20 backdrop-blur-lg rounded-2xl p-6 border border-cyan-500/20 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden z-10"
                   >
+                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                     <motion.div
-                      whileHover={{ scale: 1.05, rotate: 2 }}
-                      className="relative mb-4"
+                      className="relative mb-5"
                     >
                       <Image
                         src={member.photo_url || '/default-member.jpg'}
                         alt={member.name}
                         width={200}
                         height={200}
-                        className="rounded-full w-40 h-40 sm:w-60 sm:h-60 object-cover border-4 border-blue-500/50"
+                        className="rounded-full w-32 h-32 sm:w-48 sm:h-48 mx-auto object-cover border-4 border-cyan-500/30 group-hover:border-cyan-500/50 transition-colors duration-300"
                       />
-                      <div className="absolute inset-0 rounded-full border-4 border-transparent bg-gradient-to-r from-blue-500/30 to-purple-500/30 animate-spin-slow"></div>
                     </motion.div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-blue-400">{member.name}</h3>
-                    <p className="text-base sm:text-lg text-gray-300 mb-4">{formatRole(member.role)}</p>
-                    <div className="flex gap-4 mb-4">
+                    <h3 className="text-lg sm:text-xl font-semibold text-cyan-400 text-center">{member.name}</h3>
+                    <p className="text-sm sm:text-base text-gray-300 text-center mb-4">{formatRole(member.role)}</p>
+                    <div className="flex justify-center gap-4 mb-5">
                       {member.linkedin && (
                         <a
                           href={member.linkedin}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-300 hover:text-blue-400 transition-colors"
+                          className="text-gray-300 hover:text-cyan-400 transition-colors duration-200 cursor-pointer pointer-events-auto z-10"
+                          aria-label={`LinkedIn profile for ${member.name}`}
                         >
-                          <Linkedin size={20} />
+                          <Linkedin size={22} />
                         </a>
                       )}
                       {member.github && (
@@ -274,20 +296,23 @@ export default function Home() {
                           href={member.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-300 hover:text-blue-400 transition-colors"
+                          className="text-gray-300 hover:text-cyan-400 transition-colors duration-200 cursor-pointer pointer-events-auto z-10"
+                          aria-label={`GitHub profile for ${member.name}`}
                         >
-                          <Github size={20} />
+                          <Github size={22} />
                         </a>
                       )}
                     </div>
-                    <motion.a
-                      href={`/team-members/${member.id}`}
-                      whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)' }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-sm sm:text-base shadow-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300"
+                    <motion.button
+                      onClick={(e) => handleLearnMoreClick(member.id, e)}
+                      whileHover={{ scale: isLoading ? 1 : 1.05 }}
+                      whileTap={{ scale: isLoading ? 1 : 0.95 }}
+                      className={`block text-center px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full text-sm sm:text-base font-medium shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer z-10 pointer-events-auto w-full ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      aria-label={`View details for ${member.name}`}
+                      disabled={isLoading}
                     >
                       Detail
-                    </motion.a>
+                    </motion.button>
                   </motion.div>
                 ))
               )}
@@ -296,40 +321,41 @@ export default function Home() {
         </section>
 
         {/* Projects Section */}
-        <section id="projects" className="py-16 sm:py-20 bg-gray-900/50 backdrop-blur-sm">
+        <section id="projects" className="py-16 sm:py-24 bg-gray-900/30 backdrop-blur-lg z-10">
           <motion.h2
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-3xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500"
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-10 sm:mb-14 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500"
           >
             Our Projects
           </motion.h2>
           {isLoading ? (
-            <div className="text-center text-gray-300">Loading projects...</div>
+            <div className="text-center text-gray-300 animate-pulse">Loading projects...</div>
           ) : (
-            <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {projects.length === 0 ? (
                 <div className="text-center text-gray-300 col-span-full">No projects available.</div>
               ) : (
                 projects.map((project, index) => (
                   <motion.div
                     key={project.id}
-                    initial={{ opacity: 0, y: 50 }}
+                    initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)' }}
-                    transition={{ duration: 0.5, delay: index * 0.2 }}
-                    className="relative bg-gray-800/40 backdrop-blur-md rounded-lg shadow-lg overflow-hidden border border-blue-500/30 hover:shadow-xl transition-all duration-300"
+                    whileHover={{ scale: 1.03 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="group relative bg-gray-800/20 backdrop-blur-lg rounded-2xl shadow-lg overflow-hidden border border-cyan-500/20 hover:shadow-2xl transition-all duration-300 z-10"
                   >
-                    <div className="relative w-full aspect-w-16 aspect-h-9">
+                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    <div className="relative w-full aspect-w-16 aspect-h-9 overflow-hidden">
                       <img
                         src={project.thumbnail_path || '/default-project.jpg'}
                         alt={project.name}
-                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
-                    <div className="p-4 sm:p-6">
-                      <h3 className="text-lg sm:text-xl font-semibold mb-2 text-blue-400">{project.name}</h3>
+                    <div className="p-5 sm:p-6 relative">
+                      <h3 className="text-lg sm:text-xl font-semibold mb-3 text-cyan-400">{project.name}</h3>
                       <p className="text-sm sm:text-base text-gray-300 mb-4">
                         {expandedProjects.includes(project.id)
                           ? project.description
@@ -339,7 +365,8 @@ export default function Home() {
                         {project.description.length > DESCRIPTION_LIMIT && (
                           <button
                             onClick={() => toggleReadMore(project.id)}
-                            className="text-blue-400 hover:text-blue-300 transition-colors text-sm ml-2"
+                            className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 text-sm ml-2 cursor-pointer pointer-events-auto z-10"
+                            aria-label={expandedProjects.includes(project.id) ? `Collapse description for ${project.name}` : `Expand description for ${project.name}`}
                           >
                             {expandedProjects.includes(project.id) ? 'Read Less' : 'Read More'}
                           </button>
@@ -347,10 +374,11 @@ export default function Home() {
                       </p>
                       <a
                         href={`/projects/${project.id}`}
-                        className="text-blue-400 hover:text-blue-300 transition-colors text-sm sm:text-base relative group"
+                        className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 text-sm sm:text-base relative group cursor-pointer pointer-events-auto z-10"
+                        aria-label={`View project ${project.name}`}
                       >
                         View Project
-                        <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+                        <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-cyan-400 transition-all duration-300 group-hover:w-full"></span>
                       </a>
                     </div>
                   </motion.div>
@@ -361,36 +389,38 @@ export default function Home() {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="py-16 sm:py-20 max-w-5xl mx-auto px-4">
+        <section id="contact" className="py-16 sm:py-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
           <motion.h2
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-3xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500"
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-10 sm:mb-14 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500"
           >
             Get in Touch
           </motion.h2>
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex justify-center gap-6 sm:gap-8"
+            className="flex justify-center gap-6 sm:gap-10"
           >
             {[
-              { href: '#', icon: <Github size={28} />, label: 'GitHub' },
-              { href: '#', icon: <Linkedin size={28} />, label: 'LinkedIn' },
-              { href: 'mailto:#', icon: <Mail size={28} />, label: 'Email' },
+              { href: 'https://github.com', icon: <Github size={30} />, label: 'GitHub' },
+              { href: 'https://linkedin.com', icon: <Linkedin size={30} />, label: 'LinkedIn' },
+              { href: 'mailto:contact@coredevstudio.com', icon: <Mail size={30} />, label: 'Email' },
             ].map(({ href, icon, label }, index) => (
               <motion.a
                 key={index}
                 href={href}
                 target={href.startsWith('http') ? '_blank' : '_self'}
                 rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                whileHover={{ scale: 1.2, rotate: 5 }}
-                className="relative text-gray-300 hover:text-blue-400 transition-colors"
+                whileHover={{ scale: 1.15, color: '#22d3ee' }}
+                whileTap={{ scale: 0.95 }}
+                className="relative text-gray-300 transition-colors duration-200 cursor-pointer z-10 pointer-events-auto"
+                aria-label={`Contact us via ${label}`}
               >
                 {icon}
-                <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity">{label}</span>
+                <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">{label}</span>
               </motion.a>
             ))}
           </motion.div>
