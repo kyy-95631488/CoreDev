@@ -155,9 +155,9 @@ export default function Home() {
   };
 
   const handleLearnMoreClick = (memberId: number, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent parent card from capturing click
-    console.log(`Learn More clicked for team member ID: ${memberId}`); // Debug log
-    window.location.href = `/team-members/${memberId}`; // Fallback navigation
+    e.stopPropagation();
+    console.log(`Learn More clicked for team member ID: ${memberId}`);
+    window.location.href = `/team-members/${memberId}`;
   };
 
   return (
@@ -206,7 +206,7 @@ export default function Home() {
                 href="#projects"
                 whileHover={{ scale: isLoading ? 1 : 1.05 }}
                 whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                className={`inline-block bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`inline-block bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 aria-label="Discover Our Work"
                 onClick={(e) => isLoading && e.preventDefault()}
               >
@@ -217,11 +217,11 @@ export default function Home() {
                   href="/dashboard"
                   whileHover={{ scale: isLoading ? 1 : 1.05 }}
                   whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                  className={`inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   aria-label="Go to Dashboard"
                   onClick={(e) => isLoading && e.preventDefault()}
                 >
-                  <LayoutDashboard size={20} />
+                  <LayoutDashboard size={18} />
                   Dashboard
                 </motion.a>
               ) : (
@@ -229,16 +229,169 @@ export default function Home() {
                   href="/login"
                   whileHover={{ scale: isLoading ? 1 : 1.05 }}
                   whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                  className={`inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-500 to-cyan-500 text-white rounded-full text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white rounded-full text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   aria-label="Join Us"
                   onClick={(e) => isLoading && e.preventDefault()}
                 >
-                  <LogIn size={20} />
+                  <LogIn size={18} />
                   Join Us
                 </motion.a>
               )}
             </div>
           </motion.div>
+        </section>
+
+        {/* Mission Section */}
+        <section id="mission" className="py-16 sm:py-24 bg-gray-900/40 backdrop-blur-lg relative overflow-hidden z-10">
+          <div className="absolute inset-0 pointer-events-none">
+            <motion.div
+              className="absolute w-96 h-96 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-full blur-3xl"
+              animate={{ x: [-50, 50], y: [-50, 50], opacity: [0.2, 0.4, 0.2] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+              style={{ top: '10%', left: '20%' }}
+            ></motion.div>
+            <motion.div
+              className="absolute w-96 h-96 bg-gradient-to-br from-purple-500/20 to-cyan-500/20 rounded-full blur-3xl"
+              animate={{ x: [50, -50], y: [50, -50], opacity: [0.2, 0.4, 0.2] }}
+              transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+              style={{ bottom: '10%', right: '20%' }}
+            ></motion.div>
+          </div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-10 sm:mb-14 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500"
+          >
+            Our Mission
+          </motion.h2>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg sm:text-xl text-gray-200 text-center mb-12 max-w-3xl mx-auto"
+            >
+              We are driven to innovate, collaborate, and create digital solutions that empower businesses and transform lives.
+            </motion.p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {[
+                {
+                  title: 'Innovation',
+                  description: 'Pushing the boundaries of technology with creative and forward-thinking solutions.',
+                  icon: '🚀',
+                },
+                {
+                  title: 'Collaboration',
+                  description: 'Building strong partnerships to deliver impactful and cohesive results.',
+                  icon: '🤝',
+                },
+                {
+                  title: 'Excellence',
+                  description: 'Striving for perfection in every project, ensuring quality and precision.',
+                  icon: '🏆',
+                },
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05, boxShadow: '0 10px 30px rgba(0, 255, 255, 0.2)' }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="relative bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 border border-cyan-500/20 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  <div className="text-4xl mb-4 text-center">{item.icon}</div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-cyan-400 text-center mb-3">{item.title}</h3>
+                  <p className="text-sm sm:text-base text-gray-300 text-center">{item.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Services Section */}
+        <section id="services" className="py-16 sm:py-24 bg-gray-900/50 backdrop-blur-lg relative overflow-hidden z-10">
+          <div className="absolute inset-0 pointer-events-none">
+            <motion.div
+              className="absolute w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-purple-400/20 rounded-full blur-3xl"
+              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+              style={{ top: '15%', left: '15%' }}
+            ></motion.div>
+            <motion.div
+              className="absolute w-80 h-80 bg-gradient-to-br from-purple-400/20 to-cyan-400/20 rounded-full blur-3xl"
+              animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+              style={{ bottom: '15%', right: '15%' }}
+            ></motion.div>
+          </div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-10 sm:mb-14 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500"
+          >
+            Our Services
+          </motion.h2>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg sm:text-xl text-gray-200 text-center mb-12 max-w-3xl mx-auto"
+            >
+              From cutting-edge web development to innovative AI solutions, we provide a wide range of services to bring your vision to life.
+            </motion.p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {[
+                {
+                  title: 'Web Development',
+                  description: 'Building responsive, high-performance websites with modern frameworks and technologies.',
+                  icon: '💻',
+                },
+                {
+                  title: 'Mobile Apps',
+                  description: 'Creating seamless and intuitive mobile applications for iOS and Android platforms.',
+                  icon: '📱',
+                },
+                {
+                  title: 'AI Solutions',
+                  description: 'Leveraging machine learning and AI to deliver intelligent, data-driven solutions.',
+                  icon: '🤖',
+                },
+                {
+                  title: 'UI/UX Design',
+                  description: 'Designing user-friendly interfaces with stunning visuals and smooth interactions.',
+                  icon: '🎨',
+                },
+                {
+                  title: 'Cloud Solutions',
+                  description: 'Providing scalable and secure cloud infrastructure for seamless operations.',
+                  icon: '☁️',
+                },
+                {
+                  title: 'Cybersecurity',
+                  description: 'Ensuring robust protection with advanced security measures and threat detection.',
+                  icon: '🔒',
+                },
+              ].map((service, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05, boxShadow: '0 10px 30px rgba(0, 255, 255, 0.2)' }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="relative bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 border border-cyan-500/20 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  <div className="text-4xl mb-4 text-center">{service.icon}</div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-cyan-400 text-center mb-3">{service.title}</h3>
+                  <p className="text-sm sm:text-base text-gray-300 text-center">{service.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* About Section */}
