@@ -72,7 +72,7 @@ The project is deployed on **Vercel** for a seamless and optimized experience. T
 2. Connect your repository to Vercel via the [Vercel Dashboard](https://vercel.com/).
 3. Configure environment variables (if any) and deploy!
 
-Live Demo: [http://coredev-cyan.vercel.app/](http://coredev-cyan.vercel.app/)
+Live Demo: [https://coredev-cyan.vercel.app/](https://coredev-cyan.vercel.app/)
 
 ## 🤝 Contributing
 
