@@ -138,6 +138,7 @@ export default function AddTeamMember() {
     'Golang',
     'OOP',
     'MVP',
+    'TensorFlow Lite',
     'Supabase',
     'Google Cloud',
     'Firebase',
