@@ -50,8 +50,23 @@ export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [expandedProjects, setExpandedProjects] = useState<number[]>([]);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const fullText = "Welcome to CoreDev";
   const DESCRIPTION_LIMIT = 100;
+
+  // Set window size on client-side
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    handleResize(); // Set initial size
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -59,7 +74,11 @@ export default function Home() {
       if (sessionToken) {
         setIsLoading(true);
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/verify-session/`, {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+          if (!apiUrl) {
+            throw new Error('API URL is not defined in environment variables');
+          }
+          const response = await fetch(`${apiUrl}auth/verify-session/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_token: sessionToken }),
@@ -89,7 +108,11 @@ export default function Home() {
     const fetchProjects = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-projects-show/`, {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
+        const response = await fetch(`${apiUrl}auth/get-projects-show/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -113,7 +136,11 @@ export default function Home() {
     const fetchTeamMembers = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-team-members/`, {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl) {
+          throw new Error('API URL is not defined in environment variables');
+        }
+        const response = await fetch(`${apiUrl}auth/get-team-members/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -182,57 +209,109 @@ export default function Home() {
         <Navbar />
 
         {/* Hero Section */}
-        <section className="min-h-screen flex items-center justify-center pt-20 px-4 sm:px-6 lg:px-8 z-10">
+        <section className="min-h-screen flex items-center justify-center pt-20 px-4 sm:px-6 lg:px-8 z-10 relative overflow-hidden">
+          {/* Dynamic 3D Particles */}
+          <div className="absolute inset-0 pointer-events-none">
+            {windowSize.width > 0 &&
+              windowSize.height > 0 &&
+              [...Array(20)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-2 h-2 bg-cyan-400 rounded-full"
+                  initial={{
+                    x: Math.random() * windowSize.width,
+                    y: Math.random() * windowSize.height,
+                    scale: Math.random() * 0.5 + 0.5,
+                  }}
+                  animate={{
+                    x: Math.random() * windowSize.width,
+                    y: Math.random() * windowSize.height,
+                    scale: [0.5, 1, 0.5],
+                    opacity: [0.2, 0.8, 0.2],
+                  }}
+                  transition={{
+                    duration: 10 + Math.random() * 10,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: Math.random() * 5,
+                  }}
+                />
+              ))}
+          </div>
+
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: 'easeOut' }}
-            className="text-center max-w-5xl mx-auto"
+            className="text-center max-w-5xl mx-auto relative"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, ease: 'easeOut' }}
+            whileHover={{ rotateX: 5, rotateY: 5 }}
+            style={{ perspective: 1000 }}
           >
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-white-500 to-purple-500 animate-gradient">
-              {typedText}
-              <span className="animate-pulse text-cyan-400">|</span>
+            {/* Static Text without Glitch Effect */}
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-6 relative">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
+                {typedText}
+                <span className="animate-pulse text-cyan-400">|</span>
+              </span>
             </h1>
+
             <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.2, duration: 0.8 }}
               className="text-lg sm:text-xl md:text-2xl mb-10 text-gray-200 max-w-2xl mx-auto"
             >
               Crafting cutting-edge digital experiences with passion and precision
             </motion.p>
+
+            {/* Interactive Buttons with Hover Effects */}
             <div className="flex justify-center gap-4 sm:gap-6">
               <motion.a
                 href="#projects"
-                whileHover={{ scale: isLoading ? 1 : 1.05 }}
-                whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                className={`inline-block bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                whileHover={{ scale: isLoading ? 1 : 1.1, rotate: 2 }}
+                whileTap={{ scale: isLoading ? 1 : 0.9 }}
+                className={`relative inline-block bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto overflow-hidden ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 aria-label="Discover Our Work"
                 onClick={(e) => isLoading && e.preventDefault()}
               >
+                <motion.span
+                  className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-purple-400 opacity-0"
+                  whileHover={{ opacity: 0.3 }}
+                  transition={{ duration: 0.3 }}
+                />
                 Discover Our Work
               </motion.a>
               {isLoggedIn ? (
                 <motion.a
                   href="/dashboard"
-                  whileHover={{ scale: isLoading ? 1 : 1.05 }}
-                  whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  whileHover={{ scale: isLoading ? 1 : 1.1, rotate: -2 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.9 }}
+                  className={`relative inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto overflow-hidden ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   aria-label="Go to Dashboard"
                   onClick={(e) => isLoading && e.preventDefault()}
                 >
+                  <motion.span
+                    className="absolute inset-0 bg-gradient-to-r from-purple-400 to-cyan-400 opacity-0"
+                    whileHover={{ opacity: 0.3 }}
+                    transition={{ duration: 0.3 }}
+                  />
                   <LayoutDashboard size={18} />
                   Dashboard
                 </motion.a>
               ) : (
                 <motion.a
                   href="/login"
-                  whileHover={{ scale: isLoading ? 1 : 1.05 }}
-                  whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white rounded-full text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  whileHover={{ scale: isLoading ? 1 : 1.1, rotate: -2 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.9 }}
+                  className={`relative inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white rounded-full text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-10 pointer-events-auto overflow-hidden ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   aria-label="Join Us"
                   onClick={(e) => isLoading && e.preventDefault()}
                 >
+                  <motion.span
+                    className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-purple-400 opacity-0"
+                    whileHover={{ opacity: 0.3 }}
+                    transition={{ duration: 0.3 }}
+                  />
                   <LogIn size={18} />
                   Join Us
                 </motion.a>
@@ -559,7 +638,7 @@ export default function Home() {
             className="flex justify-center gap-6 sm:gap-10"
           >
             {[
-              { href: '$', icon: <Github size={30} />, label: 'GitHub' },
+              { href: '#', icon: <Github size={30} />, label: 'GitHub' },
               { href: '#', icon: <Linkedin size={30} />, label: 'LinkedIn' },
               { href: 'mailto:coredev.c@gmail.com', icon: <Mail size={30} />, label: 'Email' },
             ].map(({ href, icon, label }, index) => (
