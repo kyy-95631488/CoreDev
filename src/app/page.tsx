@@ -406,9 +406,9 @@ export default function Home() {
             className="flex justify-center gap-6 sm:gap-10"
           >
             {[
-              { href: 'https://github.com', icon: <Github size={30} />, label: 'GitHub' },
-              { href: 'https://linkedin.com', icon: <Linkedin size={30} />, label: 'LinkedIn' },
-              { href: 'mailto:contact@coredevstudio.com', icon: <Mail size={30} />, label: 'Email' },
+              { href: '$', icon: <Github size={30} />, label: 'GitHub' },
+              { href: '#', icon: <Linkedin size={30} />, label: 'LinkedIn' },
+              { href: 'mailto:coredev.c@gmail.com', icon: <Mail size={30} />, label: 'Email' },
             ].map(({ href, icon, label }, index) => (
               <motion.a
                 key={index}
