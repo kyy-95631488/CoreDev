@@ -43,7 +43,6 @@ const formatRole = (role: string): string => {
 };
 
 const formatTextWithSymbols = (text: string): string => {
-
   const formattedText = text
     .replace(/:\)/g, '😊')
     .replace(/:\(/g, '😔')
@@ -52,7 +51,6 @@ const formatTextWithSymbols = (text: string): string => {
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/\n/g, ' ')
     .replace(/\[paragraph\]/g, ' ');
-
   return `<p>${formattedText}</p>`;
 };
 
@@ -156,6 +154,34 @@ export default function TeamMemberDetail() {
 
   return (
     <div className="min-h-screen font-sans bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 text-white">
+      <style jsx>{`
+        /* Custom Scrollbar Styling */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(17, 24, 39, 0.5); /* Matches bg-gray-800/50 */
+          border-radius: 4px;
+          margin: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #4f46e5, #a855f7); /* Indigo to purple gradient */
+          border-radius: 4px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #6366f1, #c084fc); /* Lighter gradient on hover */
+          box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+        }
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #4f46e5 rgba(17, 24, 39, 0.5);
+        }
+        .custom-scrollbar::-webkit-scrollbar-corner {
+          background: transparent;
+        }
+      `}</style>
+
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute w-64 md:w-96 h-64 md:h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style={{ top: '5%', left: '5%' }}></div>
         <div className="absolute w-64 md:w-96 h-64 md:h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000" style={{ bottom: '10%', right: '10%' }}></div>
@@ -209,7 +235,7 @@ export default function TeamMemberDetail() {
             className="bg-gray-800/30 backdrop-blur-lg rounded-xl p-6 border border-indigo-500/20 shadow-lg hover:shadow-indigo-500/30 transition-shadow"
           >
             <h2 className="text-lg font-semibold text-indigo-400 mb-4">About</h2>
-            <div className="overflow-y-auto max-h-[300px] pr-2 scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-gray-800">
+            <div className="overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
               <div className="text-sm text-gray-300 leading-relaxed">
                 {parse(aboutContent)}
               </div>
@@ -245,7 +271,7 @@ export default function TeamMemberDetail() {
             className="bg-gray-800/30 backdrop-blur-lg rounded-xl p-6 border border-indigo-500/20 shadow-lg hover:shadow-indigo-500/30 transition-shadow md:col-span-2 lg:col-span-3"
           >
             <h2 className="text-lg font-semibold text-indigo-400 mb-4">Story</h2>
-            <div className="overflow-y-auto max-h-[300px] pr-2 scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-gray-800">
+            <div className="overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
               <div className="text-sm text-gray-300 leading-relaxed">
                 {parse(storyContent)}
               </div>
