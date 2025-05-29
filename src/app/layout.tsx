@@ -26,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="google-site-verification" content="Y8LgwvUS-owzErfIngOU_BqhjOFATSoPs5LoESP3LEM" />
         <Script src="https://js.puter.com/v2/" strategy="afterInteractive" />
       </head>
       <body
