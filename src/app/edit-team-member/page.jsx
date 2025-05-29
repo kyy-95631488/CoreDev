@@ -649,6 +649,7 @@ function EditTeamMemberContent() {
                   <option value="android_developer">Android Developer</option>
                   <option value="frontend">Frontend Developer</option>
                   <option value="backend">Backend Developer</option>
+                  <option value="machine_learning">Machine Learning</option>
                   <option value="uiux">UI/UX Designer</option>
                   <option value="qa">QA Tester</option>
                   <option value="fullstack">Full Stack Developer</option>
