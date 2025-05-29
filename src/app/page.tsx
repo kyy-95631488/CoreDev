@@ -50,7 +50,7 @@ export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [expandedProjects, setExpandedProjects] = useState<number[]>([]);
-  const fullText = "Welcome to CoreDev Studio";
+  const fullText = "Welcome to CoreDev";
   const DESCRIPTION_LIMIT = 100;
 
   useEffect(() => {
