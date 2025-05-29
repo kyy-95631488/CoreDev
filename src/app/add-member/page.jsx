@@ -160,7 +160,7 @@ export default function AddTeamMember() {
     'DevOps',
     'AWS',
     'Docker',
-    'Testing',
+    'MySql',
   ];
 
   useEffect(() => {
