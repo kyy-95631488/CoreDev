@@ -161,6 +161,25 @@ export default function AddTeamMember() {
     'AWS',
     'Docker',
     'MySql',
+    'Machine Learning Algorithms',
+    'Computer Science Fundamentals and Programming',
+    'Natural Language Processing',
+    'Neural Networks',
+    'Applied Mathematics',
+    'Communication Skills',
+    'Data Modeling and Evaluation',
+    'MATLAB',
+    'TensorFlow',
+    'PyTorch proficiency',
+    'Problem-solving skills',
+    'Git/Version Control',
+    'Testing/Debugging',
+    'RESTful Services/APIs',
+    'CSS Preprocessors',
+    'jQuery',
+    'Responsive/Mobile Design',
+    'Cross-Browser Development',
+    'MVVM Architecture'
   ];
 
   useEffect(() => {
