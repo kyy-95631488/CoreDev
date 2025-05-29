@@ -164,6 +164,24 @@ export default function ListTeamMember() {
     }
   }, [userRole]);
 
+  const formatRole = (role) => {
+    const roleMap = {
+      android_developer: 'Android Developer',
+      frontend: 'Frontend Developer',
+      backend: 'Backend Developer',
+      machine_learning: 'Machine Learning',
+      uiux: 'UI/UX Designer',
+      qa: 'QA Tester',
+      fullstack: 'Full Stack Developer',
+      devops: 'DevOps Engineer',
+    };
+
+    return roleMap[role] || role
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   const handleDeleteMember = (email) => {
     setDialogState({
       isOpen: true,
@@ -339,7 +357,7 @@ export default function ListTeamMember() {
                       </motion.button>
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-300 mb-2 capitalize">{member.role.replace('_', ' ')}</p>
+                  <p className="text-xs sm:text-sm text-gray-300 mb-2 capitalize">{formatRole(member.role)}</p>
                   <div className="text-xs sm:text-sm text-gray-400 mb-4">
                     {parse(displayDescription)}
                     {isLongDescription && (

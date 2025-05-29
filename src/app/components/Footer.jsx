@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 
 export default function Footer() {
-  const [setIsLoggedIn] = useState(false);
-  const [setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {

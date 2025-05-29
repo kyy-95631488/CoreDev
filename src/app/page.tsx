@@ -30,6 +30,7 @@ const formatRole = (role: string): string => {
     android_developer: 'Android Developer',
     frontend: 'Frontend Developer',
     backend: 'Backend Developer',
+    machine_learning: 'Machine Learning',
     uiux: 'UI/UX Designer',
     qa: 'QA Tester',
     fullstack: 'Full Stack Developer',
