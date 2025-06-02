@@ -182,9 +182,16 @@ export default function Dashboard() {
     if (userRole === 'anggota' || userRole === 'dosen') {
       const fetchUsers = async () => {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-users/`, {
+          const sessionToken = localStorage.getItem('session_token');
+          if (!sessionToken) {
+            throw new Error('No session token found');
+          }
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-users/?session_token=${encodeURIComponent(sessionToken)}`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionToken}`
+            },
           });
           const data = await response.json();
           if (response.ok) {
@@ -706,49 +713,31 @@ export default function Dashboard() {
               </thead>
               <tbody>
                 {filteredUsers.length > 0 ? (
-                  filteredUsers.map((user, index) => (
-                    <motion.tr
-                      key={index}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className="border-b border-blue-500/20 hover:bg-blue-500/10"
+                  filteredUsers.map((user, index) => (<motion.tr
+                    key={index}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                    className="border-b border-blue-500/20 hover:bg-blue-500/10"><td className="p-3 sm:p-4 text-gray-300 text-xs sm:text-sm">{user.email}</td><td className="p-3 sm:p-4 text-gray-300 text-xs sm:text-sm">{user.role}</td><td className="p-3 sm:p-4 text-gray-300 text-xs sm:text-sm">{user.verified}</td><td className="p-3 sm:p-4 text-gray-300 text-xs sm:text-sm">{user.last_login || 'Never'}</td><td className="p-3 sm:p-4 flex gap-2"><motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => openEditModal(user)}
+                      className="text-blue-400 hover:text-blue-300 p-2"
+                      title="Edit Role"
+                      aria-label={`Edit role for ${user.email}`}
                     >
-                      <td className="p-3 sm:p-4 text-gray-300 text-xs sm:text-sm">{user.email}</td>
-                      <td className="p-3 sm:p-4 text-gray-300 text-xs sm:text-sm">{user.role}</td>
-                      <td className="p-3 sm:p-4 text-gray-300 text-xs sm:text-sm">{user.verified ? 'Yes' : 'No'}</td>
-                      <td className="p-3 sm:p-4 text-gray-300 text-xs sm:text-sm">{user.last_login || 'Never'}</td>
-                      <td className="p-3 sm:p-4 flex gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => openEditModal(user)}
-                          className="text-blue-400 hover:text-blue-300 p-2"
-                          title="Edit Role"
-                          aria-label={`Edit role for ${user.email}`}
-                        >
-                          <Edit2 size={16} />
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => handleDeleteUser(user.email)}
-                          className="text-red-400 hover:text-red-300 p-2"
-                          title="Delete User"
-                          aria-label={`Delete user ${user.email}`}
-                        >
-                          <Trash2 size={16} />
-                        </motion.button>
-                      </td>
-                    </motion.tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="p-4 text-center text-gray-400 text-sm">
-                      No users found
-                    </td>
-                  </tr>
-                )}
+                      <Edit2 size={16} />
+                    </motion.button><motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleDeleteUser(user.email)}
+                      className="text-red-400 hover:text-red-300 p-2"
+                      title="Delete User"
+                      aria-label={`Delete user ${user.email}`}
+                    >
+                      <Trash2 size={16} />
+                    </motion.button></td></motion.tr>))
+                ) : (<tr><td colSpan="5" className="p-4 text-center text-gray-400 text-sm">No users found</td></tr>)}
               </tbody>
             </table>
           </div>
