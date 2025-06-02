@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Github, Linkedin, Mail, LogIn, LayoutDashboard } from 'lucide-react';
+import { Github, Linkedin, Mail, LogIn, LayoutDashboard, Rocket, Users, Trophy, Code, Smartphone, Brain, Brush, Cloud, Lock } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
@@ -247,7 +247,6 @@ export default function Home() {
             whileHover={{ rotateX: 5, rotateY: 5 }}
             style={{ perspective: 1000 }}
           >
-            {/* Static Text without Glitch Effect */}
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-6 relative">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
                 {typedText}
@@ -264,7 +263,6 @@ export default function Home() {
               Crafting cutting-edge digital experiences with passion and precision
             </motion.p>
 
-            {/* Interactive Buttons with Hover Effects */}
             <div className="flex justify-center gap-4 sm:gap-6">
               <motion.a
                 href="#projects"
@@ -358,17 +356,17 @@ export default function Home() {
                 {
                   title: 'Innovation',
                   description: 'Pushing the boundaries of technology with creative and forward-thinking solutions.',
-                  icon: '🚀',
+                  icon: <Rocket size={36} />,
                 },
                 {
                   title: 'Collaboration',
                   description: 'Building strong partnerships to deliver impactful and cohesive results.',
-                  icon: '🤝',
+                  icon: <Users size={36} />,
                 },
                 {
                   title: 'Excellence',
                   description: 'Striving for perfection in every project, ensuring quality and precision.',
-                  icon: '🏆',
+                  icon: <Trophy size={36} />,
                 },
               ].map((item, index) => (
                 <motion.div
@@ -380,7 +378,9 @@ export default function Home() {
                   className="relative bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 border border-cyan-500/20 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                  <div className="text-4xl mb-4 text-center">{item.icon}</div>
+                  <div className="flex justify-center items-center h-16 mb-4">
+                    <div className="text-cyan-400">{item.icon}</div>
+                  </div>
                   <h3 className="text-lg sm:text-xl font-semibold text-cyan-400 text-center mb-3">{item.title}</h3>
                   <p className="text-sm sm:text-base text-gray-300 text-center">{item.description}</p>
                 </motion.div>
@@ -427,32 +427,32 @@ export default function Home() {
                 {
                   title: 'Web Development',
                   description: 'Building responsive, high-performance websites with modern frameworks and technologies.',
-                  icon: '💻',
+                  icon: <Code size={36} />,
                 },
                 {
                   title: 'Mobile Apps',
                   description: 'Creating seamless and intuitive mobile applications for iOS and Android platforms.',
-                  icon: '📱',
+                  icon: <Smartphone size={36} />,
                 },
                 {
                   title: 'AI Solutions',
                   description: 'Leveraging machine learning and AI to deliver intelligent, data-driven solutions.',
-                  icon: '🤖',
+                  icon: <Brain size={36} />,
                 },
                 {
                   title: 'UI/UX Design',
                   description: 'Designing user-friendly interfaces with stunning visuals and smooth interactions.',
-                  icon: '🎨',
+                  icon: <Brush size={36} />,
                 },
                 {
                   title: 'Cloud Solutions',
                   description: 'Providing scalable and secure cloud infrastructure for seamless operations.',
-                  icon: '☁️',
+                  icon: <Cloud size={36} />,
                 },
                 {
                   title: 'Cybersecurity',
                   description: 'Ensuring robust protection with advanced security measures and threat detection.',
-                  icon: '🔒',
+                  icon: <Lock size={36} />,
                 },
               ].map((service, index) => (
                 <motion.div
@@ -464,7 +464,9 @@ export default function Home() {
                   className="relative bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 border border-cyan-500/20 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                  <div className="text-4xl mb-4 text-center">{service.icon}</div>
+                  <div className="flex justify-center items-center h-16 mb-4">
+                    <div className="text-cyan-400">{service.icon}</div>
+                  </div>
                   <h3 className="text-lg sm:text-xl font-semibold text-cyan-400 text-center mb-3">{service.title}</h3>
                   <p className="text-sm sm:text-base text-gray-300 text-center">{service.description}</p>
                 </motion.div>
@@ -638,8 +640,6 @@ export default function Home() {
             className="flex justify-center gap-6 sm:gap-10"
           >
             {[
-              { href: '#', icon: <Github size={30} />, label: 'GitHub' },
-              { href: '#', icon: <Linkedin size={30} />, label: 'LinkedIn' },
               { href: 'mailto:coredev.c@gmail.com', icon: <Mail size={30} />, label: 'Email' },
             ].map(({ href, icon, label }, index) => (
               <motion.a
