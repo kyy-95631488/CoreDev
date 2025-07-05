@@ -181,23 +181,29 @@ export default function Dashboard() {
   useEffect(() => {
     if (userRole === 'anggota' || userRole === 'dosen') {
       const fetchUsers = async () => {
+        const sessionToken = localStorage.getItem('session_token');
+        if (!sessionToken) {
+          setDialogState({
+            isOpen: true,
+            title: 'Error',
+            message: 'No session token found. Please log in again.',
+            isConfirm: false,
+          });
+          router.push('/login');
+          return;
+        }
         try {
-          const sessionToken = localStorage.getItem('session_token');
-          if (!sessionToken) {
-            throw new Error('No session token found');
-          }
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-users/?session_token=${encodeURIComponent(sessionToken)}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-users/`, {
             method: 'GET',
-            headers: { 
+            headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${sessionToken}`
+              'Authorization': sessionToken, // Send session token without Bearer
             },
           });
           const data = await response.json();
           if (response.ok) {
             setUsers(data.users);
           } else {
-            console.error('Failed to fetch users:', data.error);
             setDialogState({
               isOpen: true,
               title: 'Error',
@@ -210,14 +216,14 @@ export default function Dashboard() {
           setDialogState({
             isOpen: true,
             title: 'Error',
-            message: 'Error fetching users',
+            message: 'Error fetching users. Please try again later.',
             isConfirm: false,
           });
         }
       };
       fetchUsers();
     }
-  }, [userRole]);
+  }, [userRole, router]);
 
   useEffect(() => {
     if (userRole === 'anggota' || userRole === 'dosen') {
