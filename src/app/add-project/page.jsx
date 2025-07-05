@@ -168,36 +168,40 @@ export default function AddProject() {
   }, [router]);
 
   useEffect(() => {
-    if (userRole === 'anggota' || userRole === 'dosen') {
-      const fetchUsers = async () => {
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-users/`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          });
-          const data = await response.json();
-          if (response.ok) {
-            setUsers(data.users.filter(user => user.role === 'anggota'));
-          } else {
-            setDialogState({
-              isOpen: true,
-              title: 'Error',
-              message: `Failed to fetch users: ${data.error}`,
-              isConfirm: false,
-            });
-          }
-        } catch (err) {
-          console.error('Error fetching users:', err);
-          setDialogState({
-            isOpen: true,
-            title: 'Error',
-            message: 'Error fetching users',
-            isConfirm: false,
-          });
-        }
-      };
-      fetchUsers();
-    }
+      if (userRole === 'anggota' || userRole === 'dosen') {
+          const fetchUsers = async () => {
+              try {
+                  const sessionToken = localStorage.getItem('session_token');
+                  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/get-users/`, {
+                      method: 'GET',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': sessionToken, // Add session token to headers
+                      },
+                  });
+                  const data = await response.json();
+                  if (response.ok) {
+                      setUsers(data.users.filter(user => user.role === 'anggota'));
+                  } else {
+                      setDialogState({
+                          isOpen: true,
+                          title: 'Error',
+                          message: `Failed to fetch users: ${data.error}`,
+                          isConfirm: false,
+                      });
+                  }
+              } catch (err) {
+                  console.error('Error fetching users:', err);
+                  setDialogState({
+                      isOpen: true,
+                      title: 'Error',
+                      message: 'Error fetching users',
+                      isConfirm: false,
+                  });
+              }
+          };
+          fetchUsers();
+      }
   }, [userRole]);
 
   const handleInputChange = (e) => {
